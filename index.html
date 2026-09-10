@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FA → Regular Grammar Engine</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Interactive Computational Particle Background Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <div class="wrap">
+
+    <header>
+      <div class="header-top">
+        <div class="eyebrow">Theory of Computation · Compiler Utility</div>
+        <div class="header-actions">
+          <button type="button" class="sound-toggle-btn" id="soundToggleBtn" title="Toggle audio sound effects">
+            <span class="sound-icon">🔊</span> Sound ON
+          </button>
+          <button type="button" class="sound-density-btn" id="soundDensityBtn" title="Increase sound density and harmonic richness">
+            <span class="density-icon">🎚️</span> Density: <span class="density-val" id="densityVal">High (100%)</span>
+          </button>
+          <div class="theme-switcher" role="group" aria-label="Theme Switcher">
+            <button type="button" class="theme-btn active" data-theme-val="dark" title="Dark Cyber Theme">
+              <span>🌌</span> Dark
+            </button>
+            <button type="button" class="theme-btn" data-theme-val="midnight" title="Midnight OLED Theme">
+              <span>🌑</span> Midnight
+            </button>
+            <button type="button" class="theme-btn" data-theme-val="light" title="Clean Light Theme">
+              <span>☀️</span> Light
+            </button>
+          </div>
+        </div>
+      </div>
+      <h1>FA <span class="arrow">→</span> Regular Grammar Engine</h1>
+      <p class="subtitle">
+        Configure a DFA — states, alphabet, transition function, start and accepting states —
+        and derive its equivalent <code>Right-Linear</code> and <code>Left-Linear</code> grammars,
+        rendered as formal rule sets <code>P</code>.
+      </p>
+    </header>
+
+    <div class="grid">
+
+      <!-- LEFT: CONFIG -->
+      <div>
+        <div class="panel">
+          <p class="panel-title">Configuration <span class="panel-num">01</span></p>
+          <p class="panel-desc">Define the DFA's shape or load a standard theoretical preset.</p>
+
+          <div class="field">
+            <label for="presetSelect">Classic DFA Presets</label>
+            <select id="presetSelect">
+              <option value="ends_01" selected>Ends with "01" (3 states)</option>
+              <option value="even_0">Even number of 0s (2 states)</option>
+              <option value="contains_101">Contains substring "101" (4 states)</option>
+              <option value="div_3">Binary number divisible by 3 (3 states)</option>
+              <option value="alternating">Alternating 0s and 1s (4 states)</option>
+            </select>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="numStates">States (n)</label>
+              <input type="number" id="numStates" min="1" max="12" value="3">
+            </div>
+            <div class="field">
+              <label for="alphabet">Alphabet (Σ)</label>
+              <input type="text" id="alphabet" value="0,1">
+            </div>
+          </div>
+          <button class="btn-outline" id="buildBtn">Rebuild Table</button>
+        </div>
+
+        <div class="panel">
+          <p class="panel-title">Transition Function δ <span class="panel-num">02</span></p>
+          <p class="panel-desc">Click the chips under each state to mark <b style="color:var(--accent)">start</b> or <b style="color:var(--accent2)">final</b>. Leave a cell as <code style="background:var(--panel-2);border:1px solid var(--border-soft);padding:1px 5px;border-radius:4px;">∅</code> for no transition.</p>
+          <div class="table-scroll">
+            <table class="tt" id="ttable"></table>
+          </div>
+          <div class="btn-row">
+            <button class="btn-primary" id="generateBtn">Generate Grammars →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT: OUTPUT -->
+      <div>
+        <div class="panel">
+          <p class="panel-title">State Diagram <span class="panel-num">03</span></p>
+          <p class="panel-desc">Amber ring = start state · double ring = accepting state.</p>
+          <div id="diagram-wrap"><svg id="diagram" viewBox="0 0 700 300" width="100%" height="300"></svg></div>
+          
+          <!-- Interactive Tape & Animation Controls -->
+          <div class="tape-container" id="tapeContainer">
+            <span class="tape-label">INPUT TAPE</span>
+            <div class="tape-cells" id="tapeCells">
+              <span class="tape-placeholder">— enter string below &amp; click Run or Animate —</span>
+            </div>
+          </div>
+
+          <div class="anim-controls">
+            <div class="anim-btn-group">
+              <button type="button" class="anim-btn" id="animResetBtn" title="Reset animation to start" disabled>↺ Reset</button>
+              <button type="button" class="anim-btn" id="animPrevBtn" title="Previous step" disabled>◀ Prev</button>
+              <button type="button" class="anim-btn" id="animPlayBtn" title="Play or pause auto-step animation" disabled>▶ Play</button>
+              <button type="button" class="anim-btn" id="animNextBtn" title="Next step" disabled>Next ▶</button>
+            </div>
+            <div class="anim-status" id="animStatus">
+              <span class="status-dot" id="statusDot"></span>
+              <span id="statusText">Ready</span>
+            </div>
+            <div class="anim-speed">
+              <label for="animSpeed">Speed:</label>
+              <select id="animSpeed">
+                <option value="1200">0.75x</option>
+                <option value="800" selected>1x</option>
+                <option value="400">2x</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <p class="panel-title">Derived Grammars <span class="panel-num">04</span></p>
+          <p class="panel-desc">Generated directly from δ. Right-linear rules: <code style="background:var(--panel-2);border:1px solid var(--border-soft);padding:1px 5px;border-radius:4px;">A → aB</code>. Left-linear rules: <code style="background:var(--panel-2);border:1px solid var(--border-soft);padding:1px 5px;border-radius:4px;">A → Ba</code>.</p>
+          <div class="output-grid" id="outputGrid">
+            <div class="empty-note">— generate to view Right-Linear grammar —</div>
+            <div class="empty-note">— generate to view Left-Linear grammar —</div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <p class="panel-title">Test &amp; Derivation Trace <span class="panel-num">05</span></p>
+          <p class="panel-desc">Run a string through the DFA and watch both grammars derive it step by step.</p>
+          <div class="test-row">
+            <input type="text" id="testString" placeholder="e.g. 1101">
+            <button class="btn-primary" id="testBtn" style="width:auto;">Run</button>
+            <button class="btn-ghost" id="animateBtn" style="white-space:nowrap;" title="Start step-by-step animation">▶ Animate</button>
+          </div>
+          <div class="verdict" id="verdict"></div>
+          <div class="output-grid" id="derivationGrid"></div>
+        </div>
+      </div>
+
+    </div>
+
+    <footer>DFA CONFIG → δ TRANSCRIPTION → REGULAR GRAMMAR (G_R, G_L)</footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
