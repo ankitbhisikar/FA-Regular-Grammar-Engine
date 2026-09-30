@@ -1178,9 +1178,10 @@ function initInteractiveBackground() {
   let dpr = window.devicePixelRatio || 1;
   let particles = [];
   let ripples = [];
-  const mouse = { x: -1000, y: -1000, active: false, radius: 150 };
+  const mouse = { x: -1000, y: -1000, active: false, radius: 180 };
 
-  const glyphs = ['0', '1', 'δ', 'q', 'ε', 'Σ'];
+  const stateLabels = ['q₀', 'q₁', 'q₂', 'q₃', 'S', 'A', 'B'];
+  const glyphs = ['0', '1', 'δ', 'q', 'ε', 'Σ', 'λ', '→'];
 
   function resize() {
     dpr = window.devicePixelRatio || 1;
@@ -1196,19 +1197,43 @@ function initInteractiveBackground() {
   }
 
   function createParticles() {
-    const count = Math.max(35, Math.min(75, Math.floor((width * height) / 20000)));
+    const count = Math.max(35, Math.min(70, Math.floor((width * height) / 22000)));
     particles = [];
     for (let i = 0; i < count; i++) {
-      const isGlyph = Math.random() < 0.28;
+      const rand = Math.random();
+      let type = 'dot';
+      let radius = Math.random() * 2.5 + 2; // Core dots: 2px - 4.5px
+      let glyph = null;
+      let fontSize = 14;
+      let isFinal = false;
+
+      if (rand < 0.24) {
+        // Floating Automata State node
+        type = 'state';
+        radius = Math.random() * 4 + 10; // 10px - 14px circle radius
+        glyph = stateLabels[Math.floor(Math.random() * stateLabels.length)];
+        fontSize = 10;
+        isFinal = Math.random() < 0.35;
+      } else if (rand < 0.52) {
+        // Mathematical & automata glyph
+        type = 'glyph';
+        glyph = glyphs[Math.floor(Math.random() * glyphs.length)];
+        fontSize = Math.floor(Math.random() * 6 + 13); // 13px - 18px font
+        radius = fontSize * 0.55;
+      }
+
       particles.push({
         x: Math.random() * width,
         y: Math.random() * height,
-        vx: (Math.random() - 0.5) * 0.45,
-        vy: (Math.random() - 0.5) * 0.45,
-        radius: Math.random() * 2.2 + 1.2,
-        glyph: isGlyph ? glyphs[Math.floor(Math.random() * glyphs.length)] : null,
-        alpha: Math.random() * 0.35 + 0.15,
-        baseAlpha: Math.random() * 0.35 + 0.15
+        vx: (Math.random() - 0.5) * 0.40,
+        vy: (Math.random() - 0.5) * 0.40,
+        radius,
+        type,
+        glyph,
+        fontSize,
+        isFinal,
+        alpha: Math.random() * 0.35 + 0.25,
+        baseAlpha: Math.random() * 0.35 + 0.25
       });
     }
   }
@@ -1217,28 +1242,37 @@ function initInteractiveBackground() {
     const theme = document.documentElement.getAttribute('data-theme') || 'dark';
     if (theme === 'light') {
       return {
-        dot: 'rgba(13, 148, 136, 0.4)',
-        glyph: 'rgba(71, 85, 105, 0.35)',
-        line: 'rgba(71, 85, 105, 0.07)',
-        mouseLine: 'rgba(13, 148, 136, 0.25)',
-        ripple: 'rgba(217, 119, 6, 0.35)'
+        dot: 'rgba(13, 148, 136, 0.45)',
+        dotHalo: 'rgba(13, 148, 136, 0.12)',
+        stateRing: 'rgba(13, 148, 136, 0.55)',
+        stateFill: 'rgba(13, 148, 136, 0.08)',
+        glyph: 'rgba(51, 65, 85, 0.42)',
+        line: 'rgba(71, 85, 105, 0.10)',
+        mouseLine: 'rgba(13, 148, 136, 0.32)',
+        ripple: 'rgba(217, 119, 6, 0.42)'
       };
     } else if (theme === 'midnight') {
       return {
-        dot: 'rgba(88, 166, 255, 0.5)',
-        glyph: 'rgba(139, 148, 158, 0.4)',
-        line: 'rgba(88, 166, 255, 0.08)',
-        mouseLine: 'rgba(88, 166, 255, 0.28)',
-        ripple: 'rgba(240, 136, 62, 0.35)'
+        dot: 'rgba(88, 166, 255, 0.55)',
+        dotHalo: 'rgba(88, 166, 255, 0.15)',
+        stateRing: 'rgba(88, 166, 255, 0.65)',
+        stateFill: 'rgba(88, 166, 255, 0.10)',
+        glyph: 'rgba(160, 185, 215, 0.45)',
+        line: 'rgba(88, 166, 255, 0.12)',
+        mouseLine: 'rgba(88, 166, 255, 0.35)',
+        ripple: 'rgba(240, 136, 62, 0.42)'
       };
     } else {
       // Dark cyber (default)
       return {
-        dot: 'rgba(111, 214, 200, 0.5)',
-        glyph: 'rgba(137, 150, 179, 0.38)',
-        line: 'rgba(111, 214, 200, 0.08)',
-        mouseLine: 'rgba(227, 168, 87, 0.28)',
-        ripple: 'rgba(227, 168, 87, 0.35)'
+        dot: 'rgba(111, 214, 200, 0.55)',
+        dotHalo: 'rgba(111, 214, 200, 0.15)',
+        stateRing: 'rgba(111, 214, 200, 0.65)',
+        stateFill: 'rgba(111, 214, 200, 0.10)',
+        glyph: 'rgba(165, 185, 215, 0.45)',
+        line: 'rgba(111, 214, 200, 0.12)',
+        mouseLine: 'rgba(227, 168, 87, 0.35)',
+        ripple: 'rgba(227, 168, 87, 0.42)'
       };
     }
   }
@@ -1263,8 +1297,8 @@ function initInteractiveBackground() {
       x: e.clientX,
       y: e.clientY,
       r: 0,
-      maxR: 90,
-      alpha: 0.55
+      maxR: 150,
+      alpha: 0.60
     });
   });
 
@@ -1289,8 +1323,8 @@ function initInteractiveBackground() {
       // Update and draw ripples
       for (let i = ripples.length - 1; i >= 0; i--) {
         const rip = ripples[i];
-        rip.r += 2.2;
-        rip.alpha *= 0.94;
+        rip.r += 2.6;
+        rip.alpha *= 0.95;
         if (rip.alpha < 0.01 || rip.r > rip.maxR) {
           ripples.splice(i, 1);
           continue;
@@ -1298,7 +1332,7 @@ function initInteractiveBackground() {
         ctx.beginPath();
         ctx.arc(rip.x, rip.y, rip.r, 0, Math.PI * 2);
         ctx.strokeStyle = pal.ripple.replace(/[\d.]+\)$/, `${rip.alpha})`);
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 2.0;
         ctx.stroke();
 
         // Push nearby particles gently
@@ -1306,8 +1340,8 @@ function initInteractiveBackground() {
           const dx = p.x - rip.x;
           const dy = p.y - rip.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist > 0 && Math.abs(dist - rip.r) < 20) {
-            const push = 0.5 * (1 - dist / rip.maxR);
+          if (dist > 0 && Math.abs(dist - rip.r) < 25) {
+            const push = 0.6 * (1 - dist / rip.maxR);
             p.x += (dx / dist) * push;
             p.y += (dy / dist) * push;
           }
@@ -1320,11 +1354,11 @@ function initInteractiveBackground() {
         p.x += p.vx;
         p.y += p.vy;
 
-        // Screen wrap with soft padding
-        if (p.x < -20) p.x = width + 20;
-        else if (p.x > width + 20) p.x = -20;
-        if (p.y < -20) p.y = height + 20;
-        else if (p.y > height + 20) p.y = -20;
+        // Screen wrap with soft padding adjusted for larger particle radius
+        if (p.x < -35) p.x = width + 35;
+        else if (p.x > width + 35) p.x = -35;
+        if (p.y < -35) p.y = height + 35;
+        else if (p.y > height + 35) p.y = -35;
 
         // Mouse interaction (gentle attraction / hover filament)
         if (mouse.active) {
@@ -1337,23 +1371,57 @@ function initInteractiveBackground() {
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(mouse.x, mouse.y);
-            ctx.strokeStyle = pal.mouseLine.replace(/[\d.]+\)$/, `${proximity * 0.35})`);
-            ctx.lineWidth = 1.2 * proximity;
+            ctx.strokeStyle = pal.mouseLine.replace(/[\d.]+\)$/, `${proximity * 0.40})`);
+            ctx.lineWidth = 1.6 * proximity;
             ctx.stroke();
 
             // Subtle deflection force
-            const force = (1 - dist / mouse.radius) * 0.3;
+            const force = (1 - dist / mouse.radius) * 0.35;
             p.x += (dx / dist) * force;
             p.y += (dy / dist) * force;
           }
         }
 
-        // Draw particle (either dot or automata symbol)
-        if (p.glyph) {
-          ctx.font = '11px "IBM Plex Mono", monospace';
+        // Draw particle based on type
+        if (p.type === 'state') {
+          // Automata state circle
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+          ctx.fillStyle = pal.stateFill.replace(/[\d.]+\)$/, `${p.alpha * 0.4})`);
+          ctx.fill();
+          ctx.strokeStyle = pal.stateRing.replace(/[\d.]+\)$/, `${p.alpha})`);
+          ctx.lineWidth = 1.8;
+          ctx.stroke();
+
+          // Double ring for accepting state
+          if (p.isFinal) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, Math.max(4, p.radius - 4.5), 0, Math.PI * 2);
+            ctx.strokeStyle = pal.stateRing.replace(/[\d.]+\)$/, `${p.alpha * 0.9})`);
+            ctx.lineWidth = 1.2;
+            ctx.stroke();
+          }
+
+          // State label inside
+          ctx.font = `600 ${p.fontSize}px "IBM Plex Mono", monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillStyle = pal.glyph.replace(/[\d.]+\)$/, `${Math.min(1, p.alpha * 1.3)})`);
+          ctx.fillText(p.glyph, p.x, p.y);
+        } else if (p.type === 'glyph') {
+          // Large mathematical / automata symbol
+          ctx.font = `600 ${p.fontSize}px "IBM Plex Mono", monospace`;
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
           ctx.fillStyle = pal.glyph.replace(/[\d.]+\)$/, `${p.alpha})`);
-          ctx.fillText(p.glyph, p.x - 4, p.y + 4);
+          ctx.fillText(p.glyph, p.x, p.y);
         } else {
+          // Dot node with soft outer halo
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.radius * 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = pal.dotHalo.replace(/[\d.]+\)$/, `${p.alpha * 0.35})`);
+          ctx.fill();
+
           ctx.beginPath();
           ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
           ctx.fillStyle = pal.dot.replace(/[\d.]+\)$/, `${p.alpha})`);
@@ -1366,14 +1434,14 @@ function initInteractiveBackground() {
           const dx = p.x - p2.x;
           const dy = p.y - p2.y;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          const maxDist = 110;
+          const maxDist = 140;
           if (dist < maxDist) {
-            const lineAlpha = (1 - dist / maxDist) * 0.18;
+            const lineAlpha = (1 - dist / maxDist) * 0.19;
             ctx.beginPath();
             ctx.moveTo(p.x, p.y);
             ctx.lineTo(p2.x, p2.y);
             ctx.strokeStyle = pal.line.replace(/[\d.]+\)$/, `${lineAlpha})`);
-            ctx.lineWidth = 0.8;
+            ctx.lineWidth = 1.0;
             ctx.stroke();
           }
         }
