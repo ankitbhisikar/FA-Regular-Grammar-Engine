@@ -1,11 +1,12 @@
-const CACHE_NAME = 'fa-grammar-v1';
+const CACHE_NAME = 'fa-grammar-v2';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './script.js',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './favicon.ico'
 ];
 
 // Install: cache all core assets
