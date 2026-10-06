@@ -5,14 +5,19 @@ import subprocess, json, urllib.request, urllib.error, sys, os
 
 OWNER    = "ankitbhisikar"
 REPO     = "FA-Regular-Grammar-Engine"
-TAG      = "v1.0.0"
-NAME     = "FA Regular Grammar Engine v1.0.0"
-APK_FILE = "fa-grammar-app.apk"
-ZIP_FILE = "fa-grammar-app.zip"
+TAG      = "v1.1.0"
+NAME     = "FA Regular Grammar Engine v1.1.0"
+APK_FILE = "fa-grammar-signed.apk"
+ZIP_FILE = "fa-grammar-signed.zip"
 
-BODY = """## FA Regular Grammar Engine – v1.0.0
+BODY = """## FA Regular Grammar Engine – v1.1.0
 
-### What's new
+### Bug Fixes
+- **Fixed "App not installed" error** – Resolved signing key mismatch that caused Android to reject re-installs
+- **Fixed broken URL in app** – `startUrl` was incorrectly set to a full `https://` URL; PWABuilder concatenated it with `host`, producing `ankitbhisikar.github.iohttps://...`; now correctly split into host + path
+- **Consistent signing** – APK now always signed with the same stable credentials so upgrades install without uninstalling first
+
+### Features
 - High-tech animated **preloader** (7.5 s intro)
 - **History Manager** – stores past DFA configurations and test results
 - **SQLite backend** (`server.py`) for persistent history
@@ -20,9 +25,10 @@ BODY = """## FA Regular Grammar Engine – v1.0.0
 - Full PWA support (installable on Android)
 
 ### Install on Android
-Download **fa-grammar-app.apk** below, enable *Install unknown apps* in Android settings, then tap the APK to install.
-
-> **Note**: The APK is unsigned (debug build). For production use, sign it with a keystore via Android Studio.
+1. Uninstall any previous version of the app first (one-time step due to signing change)
+2. Download **fa-grammar-signed.apk** below
+3. Enable *Install unknown apps* in Android Settings → Security
+4. Tap the APK to install
 
 ### Web App
 Live at: https://ankitbhisikar.github.io/FA-Regular-Grammar-Engine/
