@@ -5,27 +5,25 @@ import subprocess, json, urllib.request, urllib.error, sys, os
 
 OWNER    = "ankitbhisikar"
 REPO     = "FA-Regular-Grammar-Engine"
-TAG      = "v1.1.0"
-NAME     = "FA Regular Grammar Engine v1.1.0"
+TAG      = "v1.2.0"
+NAME     = "FA Regular Grammar Engine v1.2.0"
 APK_FILE = "fa-grammar-signed.apk"
 ZIP_FILE = "fa-grammar-signed.zip"
 
-BODY = """## FA Regular Grammar Engine – v1.1.0
+BODY = """## FA Regular Grammar Engine – v1.2.0
 
-### Bug Fixes
-- **Fixed "App not installed" error** – Resolved signing key mismatch that caused Android to reject re-installs
-- **Fixed broken URL in app** – `startUrl` was incorrectly set to a full `https://` URL; PWABuilder concatenated it with `host`, producing `ankitbhisikar.github.iohttps://...`; now correctly split into host + path
-- **Consistent signing** – APK now always signed with the same stable credentials so upgrades install without uninstalling first
+### Bug Fixes & Improvements
+- **Preloader on Android** – Added full mobile-responsive CSS for the animated preloader; it now displays correctly inside the TWA/APK on all screen sizes
+- **Standalone/TWA mode** – Preloader now respects `safe-area-inset` for notched/punch-hole Android screens
+- **Landscape support** – Preloader adapts to landscape orientation on mobile
+- **Small screen support** – Specific styles for ≤380px screens (older Android devices)
 
-### Features
-- High-tech animated **preloader** (7.5 s intro)
-- **History Manager** – stores past DFA configurations and test results
-- **SQLite backend** (`server.py`) for persistent history
-- Interactive DFA diagram with grammar output
-- Full PWA support (installable on Android)
+### Previous Fixes (v1.1.0)
+- Fixed "App not installed" error from signing key mismatch
+- Fixed broken URL (`ankitbhisikar.github.iohttps://...`) in TWA launch
 
 ### Install on Android
-1. Uninstall any previous version of the app first (one-time step due to signing change)
+1. Uninstall any previous version first (one-time step)
 2. Download **fa-grammar-signed.apk** below
 3. Enable *Install unknown apps* in Android Settings → Security
 4. Tap the APK to install
