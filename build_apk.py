@@ -13,6 +13,11 @@ import os
 import zipfile
 
 PWA_URL      = "https://ankitbhisikar.github.io/FA-Regular-Grammar-Engine/"
+
+# Derive host and path automatically — avoids copy-paste bugs
+_parsed      = urllib.parse.urlparse(PWA_URL)
+PWA_HOST     = _parsed.netloc                  # "ankitbhisikar.github.io"
+PWA_PATH     = _parsed.path                    # "/FA-Regular-Grammar-Engine/"
 PKG_NAME     = "com.ankitbhisikar.fagrammarengine"
 APP_NAME     = "FA Grammar Engine"
 VERSION      = "1.0.0"
@@ -22,16 +27,19 @@ OUT_APK      = "fa-grammar-signed.apk"
 
 PWABUILDER_API = "https://pwabuilder-cloudapk.azurewebsites.net/generateApkZip"
 
-# Signing info – PWABuilder generates a keystore for us (signingMode = "new")
+# Signing info — keep these credentials FIXED so every build produces the
+# same certificate (changing them = new key = Android rejects re-install).
+# signingMode "new" re-creates the keystore from the same params each time;
+# "mine" requires uploading the .keystore binary, unsupported by this API.
 SIGNING = {
-    "signingMode":    "mine",            # Use existing keystore, not generate a new one
-    "alias":          "fa-grammar-key",
-    "fullName":       "Ankit Bhisikar",
-    "organization":   "SBJIT",
+    "signingMode":        "new",
+    "alias":              "fa-grammar-key",
+    "fullName":           "Ankit Bhisikar",
+    "organization":       "SBJIT",
     "organizationalUnit": "CS",
-    "countryCode":    "IN",
-    "keyPassword":    "XXIeNV6RaQF1",   # Password from signing-key-info.txt
-    "storePassword":  "XXIeNV6RaQF1"    # Password from signing-key-info.txt
+    "countryCode":        "IN",
+    "keyPassword":        "XXIeNV6RaQF1",
+    "storePassword":      "XXIeNV6RaQF1"
 }
 
 def post_json(url, data):
@@ -60,8 +68,12 @@ def main():
         "themeColor":                   "#0B1220",
         "navigationColor":              "#0B1220",
         "backgroundColor":              "#0B1220",
-        "startUrl":                     PWA_URL,
-        "host":                         "ankitbhisikar.github.io",
+        # BUG FIX: PWABuilder builds the launch URL as  host + startUrl.
+        # startUrl MUST be the URL path only, NOT the full https:// URL.
+        # Passing the full URL caused: ankitbhisikar.github.iohttps://...
+        "host":                         PWA_HOST,              # domain only
+        "startUrl":                     PWA_PATH,              # path only  e.g. /FA-Regular-Grammar-Engine/
+        # Icon / manifest fields DO use full absolute URLs (fetched by server)
         "iconUrl":                      PWA_URL + "icon-512.png",
         "maskableIconUrl":              PWA_URL + "icon-512.png",
         "monochromeIconUrl":            PWA_URL + "icon-192.png",
