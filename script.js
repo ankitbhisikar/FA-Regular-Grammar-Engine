@@ -5,6 +5,193 @@
  * with interactive step-by-step state diagram animation.
  */
 
+/**
+ * Site Preloader Controller
+ * Orchestrates a smooth, high-tech automata loading screen with
+ * simulated compilation steps, progress tracking, and seamless exit transition.
+ */
+const siteLoader = {
+  el: null,
+  fillEl: null,
+  pctEl: null,
+  msgEl: null,
+  skipBtn: null,
+  replayBtn: null,
+  progress: 0,
+  rafId: null,
+  startTime: 0,
+  totalDuration: 7500, // 7.5 seconds (in requested 7-8 second range)
+  isDone: false,
+  isLoadedEventFired: false,
+
+  steps: [
+    { threshold: 18, msg: 'Bootstrapping compiler environment & canvas...' },
+    { threshold: 38, msg: 'Configuring DFA states Q = {q₀, q₁, ...} & alphabet Σ...' },
+    { threshold: 58, msg: 'Computing transition function δ : Q × Σ → Q...' },
+    { threshold: 80, msg: 'Synthesizing Right-Linear & Left-Linear Grammars...' },
+    { threshold: 96, msg: 'Compiling state diagram & interactive visualizer...' },
+    { threshold: 100, msg: 'Engine ready. Launching workspace...' }
+  ],
+
+  start() {
+    this.startTime = Date.now();
+    this.el = document.getElementById('site-loader');
+    this.fillEl = document.getElementById('loaderFill');
+    this.pctEl = document.getElementById('loaderPct');
+    this.msgEl = document.getElementById('loaderLogMsg');
+    this.skipBtn = document.getElementById('loaderSkipBtn');
+    this.replayBtn = document.getElementById('replayLoaderBtn');
+
+    if (!this.el) return;
+
+    this.progress = 0;
+    this.isDone = false;
+    this.loop();
+
+    // Fallback safety timeout (totalDuration + 2.5s)
+    setTimeout(() => {
+      if (!this.isDone) this.finish();
+    }, this.totalDuration + 2500);
+  },
+
+  loop() {
+    if (this.isDone) return;
+
+    const elapsed = Date.now() - this.startTime;
+    const ratio = Math.min(1, elapsed / this.totalDuration);
+
+    // Organic progressive curve over 7.5 seconds
+    const eased = Math.pow(ratio, 0.94);
+    this.progress = Math.min(100, eased * 100);
+
+    this.render();
+
+    if (elapsed >= this.totalDuration) {
+      this.progress = 100;
+      this.render();
+      this.complete();
+      return;
+    }
+
+    this.rafId = requestAnimationFrame(() => this.loop());
+  },
+
+  render() {
+    const rounded = Math.min(100, Math.floor(this.progress));
+    if (this.fillEl) this.fillEl.style.width = `${rounded}%`;
+    if (this.pctEl) this.pctEl.textContent = `${rounded}%`;
+
+    if (this.msgEl) {
+      for (let i = 0; i < this.steps.length; i++) {
+        if (rounded <= this.steps[i].threshold || i === this.steps.length - 1) {
+          if (this.msgEl.textContent !== this.steps[i].msg) {
+            this.msgEl.textContent = this.steps[i].msg;
+          }
+          break;
+        }
+      }
+    }
+  },
+
+  onPageLoad() {
+    this.isLoadedEventFired = true;
+    // Animation progresses gracefully until totalDuration (7.5s) completes
+  },
+
+  finish() {
+    if (this.isDone) return;
+    this.progress = 100;
+    this.render();
+    this.complete();
+  },
+
+  complete() {
+    if (this.isDone) return;
+    this.isDone = true;
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+
+    if (this.msgEl) this.msgEl.textContent = 'Engine ready. Launching workspace...';
+    if (this.pctEl) this.pctEl.textContent = '100%';
+    if (this.fillEl) this.fillEl.style.width = '100%';
+
+    // Play subtle audio confirmation if sound engine is active
+    try {
+      if (typeof soundEngine !== 'undefined' && soundEngine.enabled && soundEngine.ctx && soundEngine.ctx.state === 'running') {
+        soundEngine.playAccept();
+      }
+    } catch (e) {}
+
+    setTimeout(() => {
+      if (this.el) {
+        this.el.classList.add('is-loaded');
+        this.el.setAttribute('aria-hidden', 'true');
+        setTimeout(() => {
+          this.el.style.display = 'none';
+        }, 460);
+      }
+    }, 180);
+  },
+
+  initEvents() {
+    if (this.skipBtn) {
+      this.skipBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.finish();
+      });
+    }
+
+    if (this.el) {
+      this.el.addEventListener('click', (e) => {
+        if (e.target === this.el || (e.target.classList && e.target.classList.contains('loader-ambient-glow'))) {
+          this.finish();
+        }
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (!this.isDone && (e.key === 'Escape' || e.key === 'Enter')) {
+        this.finish();
+      }
+    });
+
+    if (this.replayBtn) {
+      this.replayBtn.addEventListener('click', () => {
+        this.replay();
+      });
+    }
+  },
+
+  replay() {
+    if (!this.el) return;
+    if (this.rafId) cancelAnimationFrame(this.rafId);
+    this.isDone = false;
+    this.isLoadedEventFired = false;
+    this.progress = 0;
+    this.startTime = Date.now();
+    this.el.style.display = 'flex';
+    this.el.setAttribute('aria-hidden', 'false');
+    // Force reflow
+    void this.el.offsetWidth;
+    this.el.classList.remove('is-loaded');
+    this.loop();
+  }
+};
+
+// Immediate start of loader tracking
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => siteLoader.start());
+} else {
+  siteLoader.start();
+}
+
+if (document.readyState === 'complete') {
+  siteLoader.onPageLoad();
+} else {
+  window.addEventListener('load', () => siteLoader.onPageLoad());
+}
+
+window.replayLoader = () => siteLoader.replay();
+
 const EPS = 'ε';
 let cfg = {
   n: 3,
@@ -418,6 +605,9 @@ function generate() {
   window.__engine = { states, alpha, start, finals, trans };
   document.getElementById('derivationGrid').innerHTML = '';
   document.getElementById('verdict').className = 'verdict';
+  if (typeof historyManager !== 'undefined') {
+    historyManager.recordSnapshot('generate');
+  }
 }
 
 /**
@@ -825,6 +1015,10 @@ function runTest(autoPlay = false) {
     playSimulation();
   } else {
     goToStep(0, false);
+  }
+
+  if (typeof historyManager !== 'undefined') {
+    historyManager.recordSnapshot('test', accepted ? '✔ Accepted' : '✖ Rejected');
   }
 }
 
@@ -1454,6 +1648,533 @@ function initInteractiveBackground() {
   requestAnimationFrame(render);
 }
 
+/**
+ * Automata & Grammar History Manager
+ * Dual-persistence engine:
+ * 1. Python + SQLite Backend (/api/history, history.db)
+ * 2. Client-side LocalStorage fallback with full ANSI SQL export (.sql)
+ */
+const historyManager = {
+  items: [],
+  backend: 'checking',
+  apiEndpoint: '/api/history',
+  modalEl: null,
+  listEl: null,
+  searchInput: null,
+  badgeEl: null,
+  indicatorEl: null,
+  indicatorText: null,
+  lastSnapshotHash: null,
+  toastTimeout: null,
+
+  init() {
+    this.modalEl = document.getElementById('historyModal');
+    this.listEl = document.getElementById('historyList');
+    this.searchInput = document.getElementById('historySearchInput');
+    this.badgeEl = document.getElementById('historyBadge');
+    this.indicatorEl = document.getElementById('historyBackendIndicator');
+    this.indicatorText = document.getElementById('historyBackendText');
+
+    // Load cached local records for instantaneous display
+    this.loadFromStorage();
+    this.updateUI();
+
+    // Attach UI event listeners
+    const toggleBtn = document.getElementById('historyToggleBtn');
+    if (toggleBtn) {
+      toggleBtn.addEventListener('click', () => this.toggleModal());
+    }
+
+    const closeBtn = document.getElementById('historyCloseBtn');
+    if (closeBtn) {
+      closeBtn.addEventListener('click', () => this.closeModal());
+    }
+
+    if (this.modalEl) {
+      this.modalEl.addEventListener('click', (e) => {
+        if (e.target === this.modalEl) this.closeModal();
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.modalEl && this.modalEl.classList.contains('open')) {
+        this.closeModal();
+      }
+    });
+
+    if (this.searchInput) {
+      this.searchInput.addEventListener('input', () => this.renderList());
+    }
+
+    const exportBtn = document.getElementById('historyExportSqlBtn');
+    if (exportBtn) {
+      exportBtn.addEventListener('click', () => this.exportSql());
+    }
+
+    const syncBtn = document.getElementById('historySyncBtn');
+    if (syncBtn) {
+      syncBtn.addEventListener('click', () => this.syncToSqlite());
+    }
+
+    const clearBtn = document.getElementById('historyClearBtn');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', () => this.clearAll());
+    }
+
+    // Probe SQLite Backend
+    this.checkBackend();
+  },
+
+  async checkBackend() {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 1800);
+      const res = await fetch(this.apiEndpoint, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.status === 'ok') {
+          this.backend = 'sqlite';
+          if (this.indicatorEl) this.indicatorEl.className = 'history-status-indicator online';
+          if (this.indicatorText) this.indicatorText.textContent = '🟢 SQLite Connected (history.db)';
+          const backendVal = document.getElementById('histStatBackend');
+          if (backendVal) backendVal.textContent = 'SQLite3 (history.db)';
+
+          if (Array.isArray(data.history) && data.history.length > 0) {
+            this.items = data.history;
+            this.saveToStorage();
+          } else if (this.items.length > 0) {
+            this.syncToSqlite(true);
+          }
+          this.updateUI();
+          return;
+        }
+      }
+    } catch (e) {
+      // Backend not running on same origin or offline
+    }
+
+    this.backend = 'localStorage';
+    if (this.indicatorEl) this.indicatorEl.className = 'history-status-indicator local';
+    if (this.indicatorText) this.indicatorText.textContent = '🔵 Local Storage (Run python server.py for SQLite)';
+    const backendVal = document.getElementById('histStatBackend');
+    if (backendVal) backendVal.textContent = 'Local (Offline)';
+    this.updateUI();
+  },
+
+  loadFromStorage() {
+    try {
+      const raw = localStorage.getItem('toc_dfa_history');
+      if (raw) {
+        this.items = JSON.parse(raw);
+      }
+    } catch (e) {
+      this.items = [];
+    }
+  },
+
+  saveToStorage() {
+    try {
+      localStorage.setItem('toc_dfa_history', JSON.stringify(this.items.slice(0, 100)));
+    } catch (e) {}
+  },
+
+  async recordSnapshot(triggerSource = 'generate', verdictText = '') {
+    try {
+      const trans = (typeof readTransitions === 'function') ? readTransitions() : (window.__lastTrans || {});
+      const str = (document.getElementById('testString') ? document.getElementById('testString').value : '') || '';
+      const verdict = verdictText || (document.getElementById('verdict') ? document.getElementById('verdict').textContent : '');
+
+      let title = 'Custom DFA';
+      const presetSelect = document.getElementById('presetSelect');
+      if (presetSelect && presetSelect.selectedOptions && presetSelect.selectedOptions[0]) {
+        title = presetSelect.selectedOptions[0].text;
+      }
+      if (!title || title.includes('Custom')) {
+        title = `DFA (${cfg.n} states, |Σ|=${cfg.alphabet.length})`;
+      }
+
+      // Hash to prevent rapid consecutive duplicate saves
+      const hash = `${cfg.n}-${cfg.alphabet.join(',')}-${cfg.start}-${[...cfg.finals].join(',')}-${JSON.stringify(trans)}-${str}-${verdict}`;
+      if (this.lastSnapshotHash === hash) return;
+      this.lastSnapshotHash = hash;
+
+      const item = {
+        id: Date.now(),
+        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+        title,
+        num_states: cfg.n,
+        alphabet: [...cfg.alphabet],
+        start_state: cfg.start,
+        final_states: Array.from(cfg.finals),
+        transitions: trans,
+        sample_string: str,
+        verdict: verdict,
+        notes: `Recorded via ${triggerSource}`
+      };
+
+      this.items.unshift(item);
+      if (this.items.length > 100) this.items.pop();
+      this.saveToStorage();
+      this.updateUI();
+
+      if (this.backend === 'sqlite') {
+        fetch(this.apiEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(item)
+        }).then(res => res.json()).then(data => {
+          if (data && data.id) {
+            item.id = data.id;
+          }
+        }).catch(() => {});
+      }
+    } catch (e) {
+      console.warn('[History] Snapshot record warning:', e);
+    }
+  },
+
+  toggleModal() {
+    if (!this.modalEl) return;
+    const isOpen = this.modalEl.classList.contains('open');
+    if (isOpen) {
+      this.closeModal();
+    } else {
+      this.openModal();
+    }
+  },
+
+  openModal() {
+    if (!this.modalEl) return;
+    this.modalEl.classList.add('open');
+    this.modalEl.setAttribute('aria-hidden', 'false');
+    this.checkBackend();
+    this.renderList();
+    if (this.searchInput) {
+      setTimeout(() => this.searchInput.focus(), 100);
+    }
+  },
+
+  closeModal() {
+    if (!this.modalEl) return;
+    this.modalEl.classList.remove('open');
+    this.modalEl.setAttribute('aria-hidden', 'true');
+  },
+
+  updateUI() {
+    const total = this.items.length;
+    if (this.badgeEl) {
+      this.badgeEl.textContent = total;
+      this.badgeEl.style.display = total > 0 ? 'inline-block' : 'none';
+    }
+
+    const totalEl = document.getElementById('histStatTotal');
+    if (totalEl) totalEl.textContent = total;
+
+    let accepted = 0;
+    let rejected = 0;
+    this.items.forEach(it => {
+      const v = String(it.verdict || '');
+      if (v.includes('Accepted')) accepted++;
+      else if (v.includes('Rejected')) rejected++;
+    });
+
+    const accEl = document.getElementById('histStatAccept');
+    if (accEl) accEl.textContent = accepted;
+
+    const rejEl = document.getElementById('histStatReject');
+    if (rejEl) rejEl.textContent = rejected;
+
+    if (this.modalEl && this.modalEl.classList.contains('open')) {
+      this.renderList();
+    }
+  },
+
+  renderList() {
+    if (!this.listEl) return;
+
+    const query = this.searchInput ? this.searchInput.value.trim().toLowerCase() : '';
+    let filtered = this.items;
+
+    if (query) {
+      filtered = this.items.filter(it => {
+        const title = (it.title || '').toLowerCase();
+        const str = (it.sample_string || '').toLowerCase();
+        const verdict = (it.verdict || '').toLowerCase();
+        const states = Array.isArray(it.alphabet) ? it.alphabet.join('') : String(it.alphabet || '');
+        return title.includes(query) || str.includes(query) || verdict.includes(query) || states.includes(query);
+      });
+    }
+
+    if (filtered.length === 0) {
+      this.listEl.innerHTML = `
+        <div class="history-empty-state">
+          <div class="history-empty-icon">📜</div>
+          <p class="history-empty-title">${query ? 'No matching records found' : 'No history records yet'}</p>
+          <p class="history-empty-desc">${query ? 'Try modifying your search filter.' : 'Generate a grammar or run a test string to save history records automatically in SQLite or Local Storage.'}</p>
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+    filtered.forEach((it, index) => {
+      const finalsList = Array.isArray(it.final_states) ? it.final_states.join(', ') : (it.final_states || 'none');
+      const alphaList = Array.isArray(it.alphabet) ? it.alphabet.join(',') : (it.alphabet || '0,1');
+      const isAccept = String(it.verdict || '').includes('Accepted');
+      const isReject = String(it.verdict || '').includes('Rejected');
+
+      let verdictPill = '';
+      if (it.sample_string !== undefined && it.sample_string !== '') {
+        let badgeCls = isAccept ? 'accept' : (isReject ? 'reject' : '');
+        let badgeTxt = isAccept ? '✔ Accepted' : (isReject ? '✖ Rejected' : 'Evaluated');
+        verdictPill = `
+          <div class="history-test-row">
+            <span class="hist-str">Input String: <code>${escapeHtml(it.sample_string)}</code></span>
+            <span class="hist-verdict-badge ${badgeCls}">${badgeTxt}</span>
+          </div>
+        `;
+      }
+
+      html += `
+        <div class="history-card" data-id="${it.id || index}">
+          <div class="history-card-top">
+            <h4 class="history-card-title">
+              <span>⚙️</span> ${escapeHtml(it.title || 'DFA Configuration')}
+            </h4>
+            <span class="history-card-time">${escapeHtml(it.timestamp || '')}</span>
+          </div>
+
+          <div class="history-tags">
+            <span class="hist-tag">States: <strong>${it.num_states}</strong></span>
+            <span class="hist-tag tag-accent2">Σ = {${escapeHtml(alphaList)}}</span>
+            <span class="hist-tag tag-accent">Start: <strong>${escapeHtml(it.start_state || 'q0')}</strong></span>
+            <span class="hist-tag">Finals: <strong>{${escapeHtml(finalsList)}}</strong></span>
+          </div>
+
+          ${verdictPill}
+
+          <div class="history-card-actions">
+            <button type="button" class="hist-action-load" onclick="historyManager.restoreById(${it.id || index})" title="Restore this DFA configuration and run grammars">
+              <span>▶</span> Restore to Engine
+            </button>
+            <button type="button" class="hist-action-sub" onclick="historyManager.copySqlById(${it.id || index}, this)" title="Copy SQL INSERT query for this record">
+              <span>📋</span> Copy SQL
+            </button>
+            <button type="button" class="hist-action-sub hist-action-delete" onclick="historyManager.deleteById(${it.id || index})" title="Delete record">
+              <span>🗑️</span> Delete
+            </button>
+          </div>
+        </div>
+      `;
+    });
+
+    this.listEl.innerHTML = html;
+  },
+
+  restoreById(id) {
+    const item = this.items.find(it => it.id === id || String(it.id) === String(id)) || this.items[id];
+    if (!item) return;
+
+    try {
+      const numStatesEl = document.getElementById('numStates');
+      const alphabetEl = document.getElementById('alphabet');
+      const testStringEl = document.getElementById('testString');
+
+      cfg.n = parseInt(item.num_states, 10) || 3;
+      if (numStatesEl) numStatesEl.value = cfg.n;
+
+      const alpha = Array.isArray(item.alphabet) ? item.alphabet : String(item.alphabet).split(',').map(s => s.trim());
+      cfg.alphabet = [...alpha];
+      if (alphabetEl) alphabetEl.value = alpha.join(',');
+
+      cfg.start = item.start_state || 'q0';
+
+      const finals = Array.isArray(item.final_states) ? item.final_states : String(item.final_states || '').split(',').map(s => s.trim());
+      cfg.finals = new Set(finals.filter(Boolean));
+
+      window.__lastTrans = JSON.parse(JSON.stringify(item.transitions || {}));
+
+      buildTable();
+      generate();
+
+      if (item.sample_string !== undefined && item.sample_string !== '' && testStringEl) {
+        testStringEl.value = item.sample_string;
+        runTest(false);
+      }
+
+      this.closeModal();
+      this.showToast(`✔ Restored: ${item.title || 'DFA Configuration'}`);
+
+      try {
+        if (typeof soundEngine !== 'undefined' && soundEngine.enabled) {
+          soundEngine.playTransition();
+        }
+      } catch (e) {}
+    } catch (err) {
+      console.error('[History] Restore error:', err);
+      this.showToast('Failed to restore history configuration.');
+    }
+  },
+
+  copySqlById(id, btnEl) {
+    const item = this.items.find(it => it.id === id || String(it.id) === String(id)) || this.items[id];
+    if (!item) return;
+
+    const sql = this.generateInsertSql(item);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(sql).then(() => {
+        if (btnEl) {
+          const orig = btnEl.innerHTML;
+          btnEl.innerHTML = '<span>✔</span> Copied!';
+          btnEl.style.color = '#10B981';
+          setTimeout(() => {
+            btnEl.innerHTML = orig;
+            btnEl.style.color = '';
+          }, 1500);
+        }
+        this.showToast('SQL INSERT copied to clipboard');
+      }).catch(() => {
+        this.showToast('Failed to copy to clipboard');
+      });
+    } else {
+      prompt('Copy SQL INSERT statement:', sql);
+    }
+  },
+
+  generateInsertSql(item) {
+    const esc = (val) => {
+      if (val === null || val === undefined) return 'NULL';
+      return `'${String(val).replace(/'/g, "''")}'`;
+    };
+
+    const alphaStr = Array.isArray(item.alphabet) ? JSON.stringify(item.alphabet) : String(item.alphabet);
+    const finalsStr = Array.isArray(item.final_states) ? JSON.stringify(item.final_states) : String(item.final_states);
+    const transStr = (typeof item.transitions === 'object') ? JSON.stringify(item.transitions) : String(item.transitions || '{}');
+
+    return `INSERT INTO dfa_history (timestamp, title, num_states, alphabet, start_state, final_states, transitions_json, sample_string, verdict, notes) VALUES (${esc(item.timestamp)}, ${esc(item.title)}, ${item.num_states}, ${esc(alphaStr)}, ${esc(item.start_state)}, ${esc(finalsStr)}, ${esc(transStr)}, ${esc(item.sample_string || '')}, ${esc(item.verdict || '')}, ${esc(item.notes || '')});`;
+  },
+
+  deleteById(id) {
+    const idx = this.items.findIndex(it => it.id === id || String(it.id) === String(id));
+    if (idx !== -1) {
+      this.items.splice(idx, 1);
+      this.saveToStorage();
+      this.updateUI();
+
+      if (this.backend === 'sqlite') {
+        fetch(`/api/history/${id}`, { method: 'DELETE' }).catch(() => {});
+      }
+      this.showToast('History record deleted.');
+    }
+  },
+
+  clearAll() {
+    if (this.items.length === 0) return;
+    if (!confirm('Are you sure you want to clear all history records?')) return;
+
+    this.items = [];
+    this.saveToStorage();
+    this.updateUI();
+
+    if (this.backend === 'sqlite') {
+      fetch('/api/history', { method: 'DELETE' }).catch(() => {});
+    }
+    this.showToast('All history records cleared.');
+  },
+
+  exportSql() {
+    if (this.items.length === 0) {
+      this.showToast('No history records to export.');
+      return;
+    }
+
+    if (this.backend === 'sqlite') {
+      window.location.href = '/api/history/export.sql';
+      this.showToast('Downloading SQL dump from SQLite database...');
+      return;
+    }
+
+    const lines = [
+      '-- ============================================================',
+      '-- FA → Regular Grammar Engine · SQL History Dump',
+      `-- Exported on: ${new Date().toISOString()}`,
+      '-- ============================================================',
+      '',
+      'CREATE TABLE IF NOT EXISTS dfa_history (',
+      '    id INTEGER PRIMARY KEY AUTOINCREMENT,',
+      '    timestamp TEXT NOT NULL,',
+      '    title TEXT,',
+      '    num_states INTEGER NOT NULL,',
+      '    alphabet TEXT NOT NULL,',
+      '    start_state TEXT NOT NULL,',
+      '    final_states TEXT NOT NULL,',
+      '    transitions_json TEXT NOT NULL,',
+      '    sample_string TEXT,',
+      '    verdict TEXT,',
+      '    notes TEXT',
+      ');',
+      ''
+    ];
+
+    this.items.forEach(it => {
+      lines.push(this.generateInsertSql(it));
+    });
+
+    const blob = new Blob([lines.join('\n')], { type: 'application/sql;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `dfa_history_dump_${new Date().toISOString().substring(0, 10)}.sql`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    this.showToast('✔ Exported ANSI SQL dump file!');
+  },
+
+  async syncToSqlite(silent = false) {
+    if (this.items.length === 0) {
+      if (!silent) this.showToast('No local records to sync.');
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/history/batch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(this.items)
+      });
+      if (res.ok) {
+        const data = await res.json();
+        this.backend = 'sqlite';
+        if (this.indicatorEl) this.indicatorEl.className = 'history-status-indicator online';
+        if (this.indicatorText) this.indicatorText.textContent = '🟢 SQLite Connected (history.db)';
+        if (!silent) this.showToast(`✔ Synced ${data.inserted || this.items.length} records to SQLite database!`);
+      } else {
+        if (!silent) this.showToast('Sync failed: Python SQLite server not responding.');
+      }
+    } catch (e) {
+      if (!silent) this.showToast('Could not reach SQLite server. Start server with: python server.py');
+    }
+  },
+
+  showToast(msg) {
+    const toast = document.getElementById('historyToast');
+    if (!toast) return;
+    toast.textContent = msg;
+    toast.classList.add('show');
+    if (this.toastTimeout) clearTimeout(this.toastTimeout);
+    this.toastTimeout = setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2800);
+  }
+};
+
+window.historyManager = historyManager;
+
 // Classic Theoretical DFA Presets
 const PRESETS = {
   ends_01: {
@@ -1554,8 +2275,11 @@ if (presetSelect) {
   });
 }
 
-// Bootstrap app, theme, sound, interactive background, and initial preset
+// Bootstrap app, theme, sound, interactive background, history, and initial preset
 soundEngine.init();
 initTheme();
 initInteractiveBackground();
+historyManager.init();
 loadPreset('ends_01');
+siteLoader.initEvents();
+

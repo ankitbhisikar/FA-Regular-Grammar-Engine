@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.pyc
+
+# SQLite database
+history.db
+*.db-journal
+
+# Archives
+*.zip
+
+# Environment
+.env
+venv/
+.venv/

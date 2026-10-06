@@ -17,8 +17,103 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
   <link rel="apple-touch-icon" href="icon-192.png">
+  <script>
+    // Immediate early theme application to eliminate theme flicker
+    (function() {
+      try {
+        var t = localStorage.getItem('toc_theme');
+        if (t) document.documentElement.setAttribute('data-theme', t);
+      } catch(e) {}
+    })();
+  </script>
 </head>
 <body>
+  <!-- ============================================================
+       APPLICATION PRELOADER (Applied at the starting of body)
+       ============================================================ -->
+  <div id="site-loader" class="site-loader" role="status" aria-live="polite" aria-label="Loading FA Grammar Engine">
+    <div class="loader-ambient-glow glow-1"></div>
+    <div class="loader-ambient-glow glow-2"></div>
+    
+    <div class="loader-card">
+      <!-- Animated Theoretical Automaton Visualizer -->
+      <div class="loader-automaton" aria-hidden="true">
+        <svg class="loader-svg" viewBox="0 0 220 220" width="160" height="160">
+          <defs>
+            <linearGradient id="loaderRingGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="var(--accent)" />
+              <stop offset="100%" stop-color="var(--accent2)" />
+            </linearGradient>
+            <filter id="loaderGlowFilter" x="-30%" y="-30%" width="160%" height="160%">
+              <feGaussianBlur stdDeviation="3.5" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <!-- Outer dashed theoretical trajectory track -->
+          <circle class="loader-orbit-track" cx="110" cy="110" r="82" />
+          <circle class="loader-orbit-track inner-track" cx="110" cy="110" r="54" />
+
+          <!-- Orbiting Automata State q1 -->
+          <g class="loader-orbit-group orbit-clockwise">
+            <line class="loader-orbit-spoke" x1="110" y1="110" x2="192" y2="110" />
+            <circle class="loader-orbit-node" cx="192" cy="110" r="13" />
+            <text class="loader-orbit-text" x="192" y="110">q₁</text>
+          </g>
+
+          <!-- Orbiting Accepting Automata State q2 (Double Ring) -->
+          <g class="loader-orbit-group orbit-counter">
+            <line class="loader-orbit-spoke spoke-alt" x1="110" y1="110" x2="28" y2="110" />
+            <circle class="loader-orbit-node node-accept-outer" cx="28" cy="110" r="14" />
+            <circle class="loader-orbit-node node-accept-inner" cx="28" cy="110" r="9.5" />
+            <text class="loader-orbit-text" x="28" y="110">q₂</text>
+          </g>
+
+          <!-- Center Core Start State q0 with pulsating ring -->
+          <g class="loader-core-group">
+            <circle class="loader-core-pulse" cx="110" cy="110" r="34" />
+            <circle class="loader-core-base" cx="110" cy="110" r="26" />
+            <circle class="loader-core-ring" cx="110" cy="110" r="26" />
+            <text class="loader-core-label" x="110" y="110">q₀</text>
+            <!-- Start arrow indicator -->
+            <path class="loader-core-arrow" d="M 68 110 L 81 110 M 76 105 L 81 110 L 76 115" />
+          </g>
+        </svg>
+      </div>
+
+      <!-- Header & Subtitle -->
+      <div class="loader-info">
+        <div class="loader-pill">
+          <span class="loader-pill-dot"></span>
+          <span class="loader-pill-label">COMPUTATIONAL AUTOMATA ENGINE</span>
+        </div>
+        <h2 class="loader-title">FA <span class="loader-arrow">→</span> Regular Grammar</h2>
+        <p class="loader-tagline">Synthesizing Linear Grammars &amp; Transition δ</p>
+      </div>
+
+      <!-- High-Tech Progress Bar -->
+      <div class="loader-progress-box">
+        <div class="loader-bar-shell">
+          <div class="loader-bar-fill" id="loaderFill"></div>
+          <div class="loader-bar-glow"></div>
+        </div>
+        <div class="loader-progress-details">
+          <span class="loader-log-message" id="loaderLogMsg">Initializing transition function δ...</span>
+          <span class="loader-percentage" id="loaderPct">0%</span>
+        </div>
+      </div>
+
+      <!-- Skip Button -->
+      <button type="button" class="loader-enter-btn" id="loaderSkipBtn" title="Skip animation and enter engine immediately">
+        <span>Enter Engine</span>
+        <span class="loader-enter-key">↵</span>
+      </button>
+    </div>
+  </div>
+
   <!-- Interactive Computational Particle Background Canvas -->
   <canvas id="bg-canvas"></canvas>
 
@@ -28,6 +123,12 @@
       <div class="header-top">
         <div class="eyebrow">Theory of Computation · Compiler Utility</div>
         <div class="header-actions">
+          <button type="button" class="history-toggle-btn" id="historyToggleBtn" title="View Recent Automata & Grammar History (SQL/Python/Local)">
+            <span class="history-icon">📜</span> History <span class="history-badge" id="historyBadge">0</span>
+          </button>
+          <button type="button" class="loader-replay-btn" id="replayLoaderBtn" title="Replay intro loading screen">
+            <span class="replay-icon">⚡</span> Loader
+          </button>
           <button type="button" class="sound-toggle-btn" id="soundToggleBtn" title="Toggle audio sound effects">
             <span class="sound-icon">🔊</span> Sound ON
           </button>
@@ -162,6 +263,72 @@
 
     <footer>DFA CONFIG → δ TRANSCRIPTION → REGULAR GRAMMAR (G_R, G_L)</footer>
   </div>
+
+  <!-- ============================================================
+       AUTOMATA & GRAMMAR HISTORY DRAWER (SQL / Local Storage)
+       ============================================================ -->
+  <div id="historyModal" class="history-modal-backdrop" aria-hidden="true">
+    <div class="history-modal-panel" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+      <div class="history-modal-header">
+        <div>
+          <div class="history-eyebrow">
+            <span class="history-status-indicator" id="historyBackendIndicator" title="Storage backend status"></span>
+            <span id="historyBackendText">Checking storage backend...</span>
+          </div>
+          <h2 class="history-modal-title" id="historyModalTitle">Automata &amp; Grammar History</h2>
+          <p class="history-modal-subtitle">Recent DFA state configurations, test string verdicts, and synthesized linear grammars.</p>
+        </div>
+        <button type="button" class="history-close-btn" id="historyCloseBtn" title="Close history (&times; or Esc)">&times;</button>
+      </div>
+
+      <!-- Action Toolbar -->
+      <div class="history-toolbar">
+        <div class="history-search-wrap">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="historySearchInput" placeholder="Filter by title, states, string, verdict...">
+        </div>
+        <div class="history-actions-row">
+          <button type="button" class="hist-btn hist-btn-export" id="historyExportSqlBtn" title="Download SQLite / ANSI SQL Dump file (.sql)">
+            <span>💾</span> Export .SQL
+          </button>
+          <button type="button" class="hist-btn" id="historySyncBtn" title="Synchronize local items to Python SQLite database">
+            <span>🔄</span> Sync SQLite
+          </button>
+          <button type="button" class="hist-btn hist-btn-danger" id="historyClearBtn" title="Clear all history records">
+            <span>🗑️</span> Clear
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats pill bar -->
+      <div class="history-stats-bar">
+        <div class="hist-stat-item">
+          <span class="hist-stat-label">Total Saved:</span>
+          <span class="hist-stat-val" id="histStatTotal">0</span>
+        </div>
+        <div class="hist-stat-item">
+          <span class="hist-stat-label">Accepted:</span>
+          <span class="hist-stat-val val-accept" id="histStatAccept">0</span>
+        </div>
+        <div class="hist-stat-item">
+          <span class="hist-stat-label">Rejected:</span>
+          <span class="hist-stat-val val-reject" id="histStatReject">0</span>
+        </div>
+        <div class="hist-stat-item">
+          <span class="hist-stat-label">Database:</span>
+          <span class="hist-stat-val" id="histStatBackend">SQLite / Local</span>
+        </div>
+      </div>
+
+      <!-- Scrollable History Cards List -->
+      <div class="history-list" id="historyList">
+        <!-- Rendered dynamically via historyManager -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast notification for History restore / actions -->
+  <div id="historyToast" class="history-toast" role="status" aria-live="polite"></div>
 
   <script src="script.js"></script>
   <script>

@@ -91,6 +91,14 @@ This engine bridges the gap between state machines and grammar productions by:
   - **Grammar Failure Insight**: Displays the exact **stuck sentential form** in $G_R$ (e.g. $110 q_1$) and explains why the non-terminal cannot be eliminated (absence of $q_1 \to \varepsilon$).
   - **Formal Mathematical Theorem**: Cites the formal criterion $\delta^*(q_0, w) \notin F \implies w \notin L(M)$.
   - **Correction Hint**: Provides concrete suggestions on what inputs or state changes would make the string valid.
+- **Automata & Grammar History (Python + SQLite Backend)**:
+  - **Header History Button**: Convenient `📜 History` toggle in the top action bar with real-time counter badge.
+  - **Slide-in History Drawer**: Interactive glassmorphism drawer showcasing past DFA configurations, test strings, timestamps, and acceptance verdicts.
+  - **Python Backend (`server.py`)**: Lightweight HTTP & REST API server built using Python's standard library (`http.server` + `sqlite3`), requiring zero external pip dependencies.
+  - **SQLite Database (`history.db`)**: Persists state counts, alphabets, start/final states, JSON transition matrices, input test strings, verdicts, and grammar specs.
+  - **1-Click Restore**: Instantly reloads any historical DFA into the active configuration, rebuilding tables, redrawing diagrams, synthesizing grammars, and running derivations.
+  - **SQL Dumps & ANSI Exports**: Download complete `.sql` script containing `CREATE TABLE` and `INSERT INTO dfa_history` queries, or copy individual SQL INSERT statements to clipboard.
+  - **Dual Offline / SQLite Sync**: Automatically operates offline via `localStorage` and synchronizes seamlessly to SQLite when `server.py` is running.
 
 ---
 

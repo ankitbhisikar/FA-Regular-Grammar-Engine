@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fa-grammar-v2';
+const CACHE_NAME = 'fa-grammar-v4';
 const ASSETS = [
   './',
   './index.html',
@@ -27,8 +27,13 @@ self.addEventListener('activate', event => {
   self.clients.claim();
 });
 
-// Fetch: serve from cache, fallback to network
+// Fetch: bypass cache for API routes, else serve from cache with network fallback
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  if (url.pathname.startsWith('/api/')) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
   event.respondWith(
     caches.match(event.request).then(cached => cached || fetch(event.request))
   );
