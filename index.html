@@ -336,7 +336,22 @@
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js')
-          .then(reg => console.log('[SW] Registered:', reg.scope))
+          .then(reg => {
+            console.log('[SW] Registered:', reg.scope);
+            // Proactively check for new SW version on every launch
+            reg.update();
+            reg.addEventListener('updatefound', () => {
+              const newWorker = reg.installing;
+              if (newWorker) {
+                newWorker.addEventListener('statechange', () => {
+                  if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                    console.log('[SW] New version detected, reloading to apply latest cache...');
+                    window.location.reload();
+                  }
+                });
+              }
+            });
+          })
           .catch(err => console.warn('[SW] Registration failed:', err));
       });
     }

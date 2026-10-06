@@ -34,6 +34,8 @@ const siteLoader = {
   ],
 
   start() {
+    if (this._hasStarted) return;
+    this._hasStarted = true;
     this.startTime = Date.now();
     this.el = document.getElementById('site-loader');
     this.fillEl = document.getElementById('loaderFill');
@@ -43,6 +45,8 @@ const siteLoader = {
     this.replayBtn = document.getElementById('replayLoaderBtn');
 
     if (!this.el) return;
+
+    this.initEvents();
 
     this.progress = 0;
     this.isDone = false;
@@ -133,6 +137,9 @@ const siteLoader = {
   },
 
   initEvents() {
+    if (this._eventsInited) return;
+    this._eventsInited = true;
+
     if (this.skipBtn) {
       this.skipBtn.addEventListener('click', (e) => {
         e.stopPropagation();
@@ -178,7 +185,9 @@ const siteLoader = {
 };
 
 // Immediate start of loader tracking
-if (document.readyState === 'loading') {
+if (document.getElementById('site-loader')) {
+  siteLoader.start();
+} else if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', () => siteLoader.start());
 } else {
   siteLoader.start();
