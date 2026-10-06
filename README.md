@@ -6,8 +6,8 @@
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-GitHub_Pages-0B1220?style=for-the-badge&labelColor=1a2540)](https://ankitbhisikar.github.io/FA-Regular-Grammar-Engine/)
-[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.0.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-signed.apk)
-[![Release](https://img.shields.io/badge/🏷️_Release-v1.0.0-6e40c9?style=for-the-badge)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.0.0)
+[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.2.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.apk)
+[![Release](https://img.shields.io/badge/🏷️_Release-v1.2.0-6e40c9?style=for-the-badge)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.2.0)
 [![License](https://img.shields.io/badge/📄_License-Academic-blue?style=for-the-badge)](README.md)
 
 </div>
@@ -19,6 +19,7 @@
 - [Overview](#-overview)
 - [Key Features](#-key-features)
 - [Android App](#-android-app)
+- [Changelog](#-changelog)
 - [Theoretical Background](#-theoretical-background)
   - [1. Finite Automaton (DFA) Definition](#1-finite-automaton-dfa-definition)
   - [2. Conversion to Right-Linear Grammar ($G_R$)](#2-conversion-to-right-linear-grammar-g_r)
@@ -98,8 +99,10 @@ This engine bridges the gap between state machines and grammar productions by:
   - **1-Click Restore**: Instantly reloads any historical DFA into the active configuration.
   - **Dual Offline / SQLite Sync**: Automatically operates offline via `localStorage` and synchronizes seamlessly to SQLite when `server.py` is running.
 - **High-Tech Animated Preloader**:
-  - 7.5-second animated intro loader with circuit-board aesthetics.
-  - Organic progress bar with ease-in/ease-out interpolation.
+  - 7.5-second animated intro loader with orbiting automata states (q₀, q₁, q₂), dashed orbit tracks, and glow effects.
+  - Organic progress bar with ease-in/ease-out interpolation and real-time log messages.
+  - **Mobile & Android TWA optimized** — fully responsive CSS for all screen sizes (≤600px, ≤380px), landscape orientation, and `safe-area-inset` support for notched screens.
+  - Skip button (`Enter Engine`) for immediate access; replay button in header.
   - Auto-dismissed once the app is fully ready.
 
 ---
@@ -110,10 +113,12 @@ The FA Regular Grammar Engine is available as a native **Android app** — no Pl
 
 ### Download & Install
 
-| File | Description |
-|------|-------------|
-| [**fa-grammar-signed.apk**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-signed.apk) | ✅ Signed APK — install directly on Android |
-| [**fa-grammar-app.zip**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-app.zip) | 📦 Full package (APK + AAB + keystore) |
+| File | Size | Description |
+|------|------|-------------|
+| [**fa-grammar-signed.apk**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.apk) | 2.6 MB | ✅ Signed APK — install directly on Android |
+| [**fa-grammar-signed.zip**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.zip) | 4.9 MB | 📦 Full package (APK + AAB + keystore) |
+
+> 🏷️ **Latest Release:** [v1.2.0](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.2.0)
 
 ### Installation Steps
 
@@ -141,6 +146,30 @@ python build_apk.py
 
 # Output: fa-grammar-signed.apk (installable on Android)
 ```
+
+---
+
+## 📋 Changelog
+
+### v1.2.0 — Mobile Preloader Fix
+- **Added** full mobile-responsive CSS for the animated preloader inside the Android TWA/APK
+- **Added** `@media (display-mode: standalone)` styles with `safe-area-inset` for notched/punch-hole screens
+- **Added** landscape orientation layout for the preloader card
+- **Added** specific breakpoints for ≤600px and ≤380px screens (older Android devices)
+
+### v1.1.0 — URL & Signing Fix
+- **Fixed** broken launch URL (`ankitbhisikar.github.iohttps://...`) — `startUrl` now correctly set to path only; `host` and `startUrl` properly split for PWABuilder API
+- **Fixed** "App not installed" error — resolved signing key mismatch between builds
+- **Fixed** `signingMode` — reverted from `"mine"` (requires binary upload) to `"new"` with stable fixed credentials for consistent certificate fingerprint
+- **Added** `urllib.parse.urlparse()` to auto-derive `host` and `path` from `PWA_URL`
+
+### v1.0.0 — Initial Release
+- Full DFA → Regular Grammar conversion engine with dual grammar support ($G_R$ and $G_L$)
+- Interactive SVG state diagram with step-by-step animation and tape simulator
+- Python SQLite history backend (`server.py`) with zero pip dependencies
+- PWA support with Service Worker for offline use
+- 7.5s animated preloader with orbiting automata states visualization
+- Android TWA APK via PWABuilder
 
 ---
 
@@ -202,14 +231,14 @@ $$S \Rightarrow q_k \Rightarrow q_{k-1} a_k \Rightarrow q_{k-2} a_{k-1} a_k \Rig
 FA-Regular-Grammar-Engine/
 │
 ├── index.html          # Main application markup & UI layout
-├── style.css           # Custom styling, dark cybernetic theme & responsive grid
+├── style.css           # Custom styling, dark cybernetic theme, responsive grid & mobile preloader
 ├── script.js           # State engine, grammar synthesis, SVG drawing & simulator
 ├── manifest.json       # PWA manifest (icons, theme, display mode)
 ├── sw.js               # Service Worker (offline caching + API bypass)
 ├── server.py           # Python SQLite REST API backend for history persistence
 ├── build_apk.py        # Auto-generates signed Android APK via PWABuilder API
+├── upload_release.py   # Creates GitHub Release (v1.x.x) and uploads APK assets
 ├── enable_pages.py     # Enables GitHub Pages via GitHub REST API
-├── upload_release.py   # Creates GitHub Release and uploads APK assets
 ├── .gitignore          # Excludes history.db, __pycache__, .zip files
 └── README.md           # Comprehensive technical documentation (this file)
 ```
@@ -240,7 +269,7 @@ Visit directly — no setup needed:
 
 ### Method 2: Android App
 Download and install the signed APK:  
-👉 **[fa-grammar-signed.apk](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-signed.apk)**
+👉 **[fa-grammar-signed.apk (v1.2.0)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.apk)**
 
 ### Method 3: Local Development
 ```bash
