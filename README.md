@@ -3,12 +3,22 @@
 > **Theory of Computation (TOC) — Technical Assessment Exercise 1 (TAE 1)**  
 > An interactive web tool and visualization engine for converting Deterministic Finite Automata (DFA) into formal **Right-Linear** and **Left-Linear** Regular Grammars with step-by-step derivation tracing.
 
+<div align="center">
+
+[![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-GitHub_Pages-0B1220?style=for-the-badge&labelColor=1a2540)](https://ankitbhisikar.github.io/FA-Regular-Grammar-Engine/)
+[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.0.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-signed.apk)
+[![Release](https://img.shields.io/badge/🏷️_Release-v1.0.0-6e40c9?style=for-the-badge)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.0.0)
+[![License](https://img.shields.io/badge/📄_License-Academic-blue?style=for-the-badge)](README.md)
+
+</div>
+
 ---
 
 ## 📌 Table of Contents
 
 - [Overview](#-overview)
 - [Key Features](#-key-features)
+- [Android App](#-android-app)
 - [Theoretical Background](#-theoretical-background)
   - [1. Finite Automaton (DFA) Definition](#1-finite-automaton-dfa-definition)
   - [2. Conversion to Right-Linear Grammar ($G_R$)](#2-conversion-to-right-linear-grammar-g_r)
@@ -71,34 +81,66 @@ This engine bridges the gap between state machines and grammar productions by:
   - **Musical Transition Steps**: Synthesizes pleasant ascending pentatonic tones ($329\text{ Hz} - 880\text{ Hz}$) as the traveling particle transitions between states.
   - **Triumphant Acceptance Chime**: Plays a 4-note ascending major arpeggio ($C_5 \to E_5 \to G_5 \to C_6$) when reaching an accepting state.
   - **Rejection & Trap Buzz**: Low-frequency descending warning tone for strings ending in non-accepting or dead states.
-  - **Ambient Click Ripples**: Delicate water-drop chime when clicking the background canvas.
-  - **Sound Density & Harmonic Layering Button**: Dedicated `🎚️ Density` button in the header that cycles through multi-tier sound densities:
-    - `Soft (40%)`: Single gentle sine oscillator for quiet environments.
-    - `Mid (70%)`: Standard presence with balanced decay.
-    - `High (100%)`: Multi-oscillator layering with chorus detune for rich fullness.
-    - `Ultra (150%)`: 3-oscillator synthesis including octave overtone harmonics for maximum punch and acoustic presence.
-  - **1-Click Audio Toggle**: `🔊 Sound ON` / `🔇 Sound OFF` control in the header, with user preference saved in `localStorage`.
+  - **Sound Density & Harmonic Layering Button**: Dedicated `🎚️ Density` button in the header that cycles through multi-tier sound densities.
 - **String Simulator & Derivation Tracer**:
   - Simulates any arbitrary test string $w \in \Sigma^*$.
   - Displays transition trajectory: $q_0 \xrightarrow{a_1} q_1 \xrightarrow{a_2} \dots \xrightarrow{a_k} q_k$.
   - Renders production rule derivation sequences showing how each grammar expands or unwinds the string step by step.
 - **Automated Rejection Diagnosis & Formal Academic Explanation**:
-  - **Categorized Failure Diagnosis**: Pinpoints the exact theoretical cause of rejection:
-    - `Invalid Symbol (a ∉ Σ)`: Highlights characters outside the defined alphabet.
-    - `Missing Transition (δ(q, a) = ∅)`: Identifies points where the automaton was prematurely trapped.
-    - `Non-Final Terminal State (q_end ∉ F)`: Compares the halt state against the set of accepting states $F$.
-    - `Empty String Rejection (q_0 ∉ F)`: Explains why $\varepsilon \notin L(M)$.
-  - **Grammar Failure Insight**: Displays the exact **stuck sentential form** in $G_R$ (e.g. $110 q_1$) and explains why the non-terminal cannot be eliminated (absence of $q_1 \to \varepsilon$).
+  - **Categorized Failure Diagnosis**: Pinpoints the exact theoretical cause of rejection.
+  - **Grammar Failure Insight**: Displays the exact **stuck sentential form** in $G_R$ and explains why the non-terminal cannot be eliminated.
   - **Formal Mathematical Theorem**: Cites the formal criterion $\delta^*(q_0, w) \notin F \implies w \notin L(M)$.
-  - **Correction Hint**: Provides concrete suggestions on what inputs or state changes would make the string valid.
 - **Automata & Grammar History (Python + SQLite Backend)**:
   - **Header History Button**: Convenient `📜 History` toggle in the top action bar with real-time counter badge.
   - **Slide-in History Drawer**: Interactive glassmorphism drawer showcasing past DFA configurations, test strings, timestamps, and acceptance verdicts.
   - **Python Backend (`server.py`)**: Lightweight HTTP & REST API server built using Python's standard library (`http.server` + `sqlite3`), requiring zero external pip dependencies.
   - **SQLite Database (`history.db`)**: Persists state counts, alphabets, start/final states, JSON transition matrices, input test strings, verdicts, and grammar specs.
-  - **1-Click Restore**: Instantly reloads any historical DFA into the active configuration, rebuilding tables, redrawing diagrams, synthesizing grammars, and running derivations.
-  - **SQL Dumps & ANSI Exports**: Download complete `.sql` script containing `CREATE TABLE` and `INSERT INTO dfa_history` queries, or copy individual SQL INSERT statements to clipboard.
+  - **1-Click Restore**: Instantly reloads any historical DFA into the active configuration.
   - **Dual Offline / SQLite Sync**: Automatically operates offline via `localStorage` and synchronizes seamlessly to SQLite when `server.py` is running.
+- **High-Tech Animated Preloader**:
+  - 7.5-second animated intro loader with circuit-board aesthetics.
+  - Organic progress bar with ease-in/ease-out interpolation.
+  - Auto-dismissed once the app is fully ready.
+
+---
+
+## 📱 Android App
+
+The FA Regular Grammar Engine is available as a native **Android app** — no Play Store required!
+
+### Download & Install
+
+| File | Description |
+|------|-------------|
+| [**fa-grammar-signed.apk**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-signed.apk) | ✅ Signed APK — install directly on Android |
+| [**fa-grammar-app.zip**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-app.zip) | 📦 Full package (APK + AAB + keystore) |
+
+### Installation Steps
+
+1. **Download** `fa-grammar-signed.apk` from the link above to your Android phone
+2. **Allow unknown sources**: Go to **Settings → Security** (or **Settings → Apps → Special app access → Install unknown apps**) and allow your browser/file manager
+3. **Tap** the downloaded APK file → **Install**
+4. Open **FA Grammar Engine** from your app drawer 🎉
+
+> **Note**: The app uses [Trusted Web Activity (TWA)](https://developer.chrome.com/docs/android/trusted-web-activity/) — it wraps the live GitHub Pages site in a native Android shell and always stays up to date automatically.
+
+### Requirements
+- Android **5.0 (Lollipop)** or higher
+- Google Chrome installed (for TWA rendering)
+- Internet connection (loads the live web app)
+
+### Build from Source
+To regenerate the APK yourself:
+```bash
+# 1. Clone the repo
+git clone https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine.git
+cd FA-Regular-Grammar-Engine
+
+# 2. Run the builder (requires Python 3.6+)
+python build_apk.py
+
+# Output: fa-grammar-signed.apk (installable on Android)
+```
 
 ---
 
@@ -156,27 +198,35 @@ $$S \Rightarrow q_k \Rightarrow q_{k-1} a_k \Rightarrow q_{k-2} a_{k-1} a_k \Rig
 
 ## 📂 Project Architecture & File Structure
 
-The project has been separated into clean, modular components:
-
 ```text
-TOC TAE 1/
+FA-Regular-Grammar-Engine/
 │
-├── index.html                  # Main application markup & UI layout
-├── dfa-to-grammar-engine.html  # Alternative entry point (identical modular structure)
-├── style.css                   # Custom styling, dark cybernetic theme & responsive grid
-├── script.js                   # State engine, grammar synthesis, SVG drawing & simulator
-└── README.md                   # Comprehensive technical documentation
+├── index.html          # Main application markup & UI layout
+├── style.css           # Custom styling, dark cybernetic theme & responsive grid
+├── script.js           # State engine, grammar synthesis, SVG drawing & simulator
+├── manifest.json       # PWA manifest (icons, theme, display mode)
+├── sw.js               # Service Worker (offline caching + API bypass)
+├── server.py           # Python SQLite REST API backend for history persistence
+├── build_apk.py        # Auto-generates signed Android APK via PWABuilder API
+├── enable_pages.py     # Enables GitHub Pages via GitHub REST API
+├── upload_release.py   # Creates GitHub Release and uploads APK assets
+├── .gitignore          # Excludes history.db, __pycache__, .zip files
+└── README.md           # Comprehensive technical documentation (this file)
 ```
 
 ### File Responsibilities:
-- **`index.html`**: Semantic HTML5 layout featuring header, two-column responsive grid, configuration panels, SVG canvas, grammar display cards, and derivation output panels.
-- **`style.css`**: CSS3 variable design tokens (`--bg`, `--panel`, `--accent`, `--accent2`), flexbox/grid layouts, custom scrollbars, typography using IBM Plex Sans/Mono and Space Grotesk, and responsive breakpoints.
+- **`index.html`**: Semantic HTML5 layout featuring header, two-column responsive grid, configuration panels, SVG canvas, grammar display cards, derivation output panels, preloader, and history modal.
+- **`style.css`**: CSS3 variable design tokens (`--bg`, `--panel`, `--accent`, `--accent2`), flexbox/grid layouts, custom scrollbars, typography using IBM Plex Sans/Mono and Space Grotesk, preloader animations, and history drawer styles.
 - **`script.js`**:
+  - `siteLoader`: Preloader controller with organic ease-in/ease-out timing.
+  - `historyManager`: Dual-persistence engine (localStorage + SQLite backend).
   - `buildTable()`: Generates dynamic matrix UI with start/final state chips.
   - `generate()`: Extracts DFA configuration and executes grammar conversion algorithms.
   - `renderGrammars()`: Formats formal grammar tuples and production rules.
   - `drawDiagram()`: Calculates trigonometric coordinates and renders interactive SVG states, transitions, markers, and labels.
   - `runTest()`: Evaluates string acceptance and builds step-by-step derivation HTML trees.
+- **`server.py`**: Lightweight Python HTTP server with SQLite-backed REST API (`/api/history` GET/POST/DELETE, `/api/export-sql` GET). Zero pip dependencies.
+- **`build_apk.py`**: Calls PWABuilder cloud API to generate a signed Android APK from the GitHub Pages URL.
 
 ---
 
@@ -184,20 +234,33 @@ TOC TAE 1/
 
 No build step, bundler, or external package installation is required.
 
-### Method 1: Direct File Launch
-Simply double-click [`index.html`](file:///c:/Users/Ankit/OneDrive/Desktop/TOC%20TAE%201/index.html) or open it directly in any modern web browser (Chrome, Edge, Firefox, Safari).
+### Method 1: Live Web App (Recommended)
+Visit directly — no setup needed:  
+👉 **https://ankitbhisikar.github.io/FA-Regular-Grammar-Engine/**
 
-### Method 2: Local HTTP Server (Python)
-If you prefer running via a local server:
+### Method 2: Android App
+Download and install the signed APK:  
+👉 **[fa-grammar-signed.apk](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.0.0/fa-grammar-signed.apk)**
+
+### Method 3: Local Development
 ```bash
-# In the project directory:
-python -m http.server 8000
-```
-Then navigate to `http://localhost:8000` in your browser.
+# Clone the repository
+git clone https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine.git
+cd FA-Regular-Grammar-Engine
 
-### Method 3: VS Code Live Server
+# Start the app (no build needed — just open in browser)
+# Option A: Python simple server
+python -m http.server 8000
+# Then open: http://localhost:8000
+
+# Option B: Enable SQLite history backend
+python server.py 8000
+# Then open: http://localhost:8000
+```
+
+### Method 4: VS Code Live Server
 1. Open the project folder in VS Code.
-2. Right-click [`index.html`](file:///c:/Users/Ankit/OneDrive/Desktop/TOC%20TAE%201/index.html) and select **Open with Live Server**.
+2. Right-click `index.html` and select **Open with Live Server**.
 
 ---
 
@@ -226,6 +289,12 @@ Then navigate to `http://localhost:8000` in your browser.
    - Enter an input string into the text field (e.g., `1001`, `01`).
    - Click **Run** or press <kbd>Enter</kbd>.
    - View the **Accepted / Rejected verdict**, transition path, and detailed step-by-step derivations in both grammars.
+
+6. **Step 06 — History**:
+   - Click the **📜 History** button in the header to open the history drawer.
+   - View past DFA configurations, test strings, timestamps, and verdicts.
+   - Click **Restore** on any entry to reload that DFA configuration instantly.
+   - Use **Export SQL** to download a complete `.sql` dump of the history database.
 
 ---
 
@@ -272,11 +341,6 @@ Then navigate to `http://localhost:8000` in your browser.
 - **States**: $Q = \{q_0, q_1, q_2, q_3\}$ ($q_3$ = pattern matched)
 - **Start State**: $q_0$
 - **Final States**: $F = \{q_3\}$
-- **Transitions**:
-  - $\delta(q_0, 0) = q_0$, $\delta(q_0, 1) = q_1$
-  - $\delta(q_1, 0) = q_2$, $\delta(q_1, 1) = q_1$
-  - $\delta(q_2, 0) = q_0$, $\delta(q_2, 1) = q_3$
-  - $\delta(q_3, 0) = q_3$, $\delta(q_3, 1) = q_3$
 
 **Test Strings**:
 - `101`: **Accepted** ($q_0 \to q_1 \to q_2 \to q_3$)
@@ -288,12 +352,7 @@ Then navigate to `http://localhost:8000` in your browser.
 ### Example 4: Binary Numbers Divisible by 3
 - **Alphabet**: $\Sigma = \{0, 1\}$
 - **States**: $Q = \{q_0, q_1, q_2\}$ (where $q_i$ represents remainder $i \pmod 3$)
-- **Start State**: $q_0$
-- **Final States**: $F = \{q_0\}$
-- **Transitions**:
-  - $\delta(q_0, 0) = q_0$, $\delta(q_0, 1) = q_1$ ($2 \times 0 + 0 = 0$, $2 \times 0 + 1 = 1$)
-  - $\delta(q_1, 0) = q_2$, $\delta(q_1, 1) = q_0$ ($2 \times 1 + 0 = 2$, $2 \times 1 + 1 = 3 \equiv 0$)
-  - $\delta(q_2, 0) = q_1$, $\delta(q_2, 1) = q_2$ ($2 \times 2 + 0 = 4 \equiv 1$, $2 \times 2 + 1 = 5 \equiv 2$)
+- **Start State**: $q_0$, **Final States**: $F = \{q_0\}$
 
 **Test Strings**:
 - `11` ($3_{10}$): **Accepted**
@@ -303,16 +362,10 @@ Then navigate to `http://localhost:8000` in your browser.
 
 ---
 
-### Example 5: Alternating 0s and 1s (No Consecutive Identical Symbols)
+### Example 5: Alternating 0s and 1s
 - **Alphabet**: $\Sigma = \{0, 1\}$
 - **States**: $Q = \{q_0, q_1, q_2, q_3\}$ ($q_3$ = trap state)
-- **Start State**: $q_0$
-- **Final States**: $F = \{q_0, q_1, q_2\}$
-- **Transitions**:
-  - $\delta(q_0, 0) = q_1$, $\delta(q_0, 1) = q_2$
-  - $\delta(q_1, 0) = q_3$, $\delta(q_1, 1) = q_2$
-  - $\delta(q_2, 0) = q_1$, $\delta(q_2, 1) = q_3$
-  - $\delta(q_3, 0) = q_3$, $\delta(q_3, 1) = q_3$
+- **Start State**: $q_0$, **Final States**: $F = \{q_0, q_1, q_2\}$
 
 **Test Strings**:
 - `0101`: **Accepted**
@@ -323,18 +376,20 @@ Then navigate to `http://localhost:8000` in your browser.
 
 ## 🧰 Technologies Used
 
-- **HTML5**: Semantic document structure, SVG vector canvas.
-- **Vanilla CSS3**:
-  - Modern CSS custom properties (variables) for theme consistency.
-  - CSS Grid and Flexbox for responsive layouts.
-  - Web fonts: [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk), [IBM Plex Sans](https://fonts.google.com/specimen/IBM+Plex+Sans), and [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono).
-- **Vanilla JavaScript (ES6+)**:
-  - Native DOM manipulation without heavyweight dependencies.
-  - Mathematical string simulation & path generation algorithms.
-  - Coordinate calculation for SVG state machine rendering.
+| Technology | Usage |
+|---|---|
+| **HTML5** | Semantic document structure, SVG vector canvas, PWA manifest |
+| **Vanilla CSS3** | CSS custom properties, Grid/Flexbox layouts, animations, glassmorphism |
+| **Vanilla JavaScript (ES6+)** | DFA engine, grammar synthesis, SVG rendering, Web Audio API |
+| **Python 3 + sqlite3** | SQLite history backend (`server.py`) — zero pip dependencies |
+| **Service Worker** | Offline PWA caching via `sw.js` |
+| **PWABuilder** | Trusted Web Activity (TWA) Android APK generation |
+| **GitHub Pages** | Free static hosting at `ankitbhisikar.github.io/FA-Regular-Grammar-Engine/` |
+
+**Web Fonts**: [Space Grotesk](https://fonts.google.com/specimen/Space+Grotesk), [IBM Plex Sans](https://fonts.google.com/specimen/IBM+Plex+Sans), [IBM Plex Mono](https://fonts.google.com/specimen/IBM+Plex+Mono)
 
 ---
 
 ## 📄 License & Academic Integrity
 
-This project is created for educational and academic evaluation purposes for **Theory of Computation (TOC)** coursework. Free to study, extend, and adapt.
+This project is created for educational and academic evaluation purposes for **Theory of Computation (TOC)** coursework at **SBJIT**. Free to study, extend, and adapt.
