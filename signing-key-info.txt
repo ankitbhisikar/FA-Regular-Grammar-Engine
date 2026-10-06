@@ -1,0 +1,10 @@
+Keep this file and signing.keystore in a safe place. You'll need these files if you want to upload future versions of your PWA to the Google Play Store.
+
+Key store file: signing.keystore
+Key store password: XXIeNV6RaQF1
+Key alias: fa-grammar-key
+Key password: XXIeNV6RaQF1
+Signer's full name: Ankit Bhisikar
+Signer's organization: SBJIT
+Signer's organizational unit: CS
+Signer's country code: IN

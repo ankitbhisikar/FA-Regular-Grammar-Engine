@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.ankitbhisikar.fagrammarengine",
+        "sha256_cert_fingerprints": ["69:F0:BE:F7:69:F7:AE:EC:51:57:B6:8B:A1:60:75:BB:56:DB:C4:92:07:BB:83:EF:D4:31:99:09:B6:59:DB:7C"]
+      }
+    }]

@@ -17,3 +17,12 @@ history.db
 .env
 venv/
 .venv/
+
+# Android build artifacts (generated — not source)
+*.apk
+*.aab
+*.keystore
+
+# Browser-saved HTML dumps
+*.apk.html
+*_files/
