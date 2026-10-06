@@ -24,14 +24,14 @@ PWABUILDER_API = "https://pwabuilder-cloudapk.azurewebsites.net/generateApkZip"
 
 # Signing info – PWABuilder generates a keystore for us (signingMode = "new")
 SIGNING = {
-    "signingMode":    "new",
+    "signingMode":    "mine",            # Use existing keystore, not generate a new one
     "alias":          "fa-grammar-key",
     "fullName":       "Ankit Bhisikar",
     "organization":   "SBJIT",
     "organizationalUnit": "CS",
     "countryCode":    "IN",
-    "keyPassword":    "FAGrammar2024!",
-    "storePassword":  "FAGrammar2024!"
+    "keyPassword":    "XXIeNV6RaQF1",   # Password from signing-key-info.txt
+    "storePassword":  "XXIeNV6RaQF1"    # Password from signing-key-info.txt
 }
 
 def post_json(url, data):
