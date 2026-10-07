@@ -2164,3 +2164,504 @@ footer {
   }
 }
 
+/* ============================================================
+   MAIN APP — MOBILE & TABLET RESPONSIVE
+   Full mobile layout overhaul for the FA Grammar Engine app
+   ============================================================ */
+
+/* ── Tablet: ≤ 768px ── */
+@media (max-width: 768px) {
+  body {
+    padding: 16px 12px 48px;
+  }
+
+  .wrap {
+    max-width: 100%;
+  }
+
+  /* Header */
+  header {
+    margin-bottom: 20px;
+  }
+
+  .header-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .header-actions {
+    width: 100%;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .sound-toggle-btn,
+  .loader-replay-btn,
+  .history-toggle-btn,
+  .sound-density-btn {
+    font-size: 11px;
+    padding: 5px 10px;
+  }
+
+  h1 {
+    font-size: clamp(22px, 6vw, 32px);
+    margin: 0 0 8px;
+  }
+
+  .subtitle {
+    font-size: 13.5px;
+  }
+
+  /* Grid becomes single column */
+  .grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  /* Panels */
+  .panel {
+    padding: 16px 14px;
+  }
+
+  /* Output grid: grammar cards side-by-side on tablet */
+  .output-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* History side-panel goes wider */
+  .history-modal-panel {
+    width: 92vw;
+  }
+
+  /* Anim controls wrap better */
+  .anim-controls {
+    gap: 8px;
+  }
+
+  .anim-btn {
+    font-size: 11.5px;
+    padding: 6px 10px;
+  }
+
+  /* Toast — keep away from bottom nav on mobile */
+  .history-toast {
+    bottom: 16px;
+    right: 12px;
+    left: 12px;
+    font-size: 11.5px;
+  }
+}
+
+/* ── Mobile phone: ≤ 600px ── */
+@media (max-width: 600px) {
+  body {
+    padding: 12px 10px 40px;
+    /* Respect Android/iOS safe areas (notch, home bar) */
+    padding-top: max(12px, env(safe-area-inset-top));
+    padding-bottom: max(40px, env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+  }
+
+  /* ── Header condensed ── */
+  .eyebrow {
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+  }
+
+  .header-actions {
+    gap: 5px;
+  }
+
+  /* Condense utility buttons to icon + short label */
+  .history-toggle-btn .history-icon,
+  .loader-replay-btn .replay-icon,
+  .sound-toggle-btn .sound-icon,
+  .sound-density-btn .density-icon {
+    font-size: 14px;
+  }
+
+  .sound-toggle-btn,
+  .loader-replay-btn,
+  .history-toggle-btn,
+  .sound-density-btn {
+    padding: 6px 8px;
+    font-size: 10.5px;
+    border-radius: 7px;
+    gap: 4px;
+  }
+
+  /* Hide verbose text in density button, keep icon + value */
+  .sound-density-btn .density-icon ~ *:not(.density-val) {
+    display: none;
+  }
+
+  /* Theme switcher — compact */
+  .theme-switcher {
+    padding: 2px;
+    gap: 2px;
+  }
+
+  .theme-btn {
+    padding: 4px 7px;
+    font-size: 10.5px;
+    gap: 4px;
+  }
+
+  h1 {
+    font-size: clamp(18px, 6.5vw, 26px);
+  }
+
+  .subtitle {
+    font-size: 12.5px;
+    line-height: 1.5;
+  }
+
+  /* ── Panels ── */
+  .panel {
+    padding: 14px 12px;
+    border-radius: 8px;
+  }
+
+  .panel + .panel {
+    margin-top: 12px;
+  }
+
+  .panel-title {
+    font-size: 13px;
+  }
+
+  .panel-desc {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  /* ── Field row: stack on very small screens ── */
+  .field-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  /* ── Transition table ── */
+  .table-scroll {
+    border-radius: 6px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  table.tt th,
+  table.tt td {
+    padding: 5px 6px;
+    font-size: 12px;
+  }
+
+  table.tt select {
+    font-size: 11.5px;
+    padding: 3px;
+  }
+
+  /* ── State diagram SVG ── */
+  #diagram-wrap svg {
+    height: 240px;
+  }
+
+  /* ── Tape strip ── */
+  .tape-container {
+    padding: 8px 10px;
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .tape-label {
+    font-size: 9.5px;
+    letter-spacing: 0.08em;
+  }
+
+  .tape-cell {
+    min-width: 26px;
+    height: 26px;
+    font-size: 12px;
+  }
+
+  /* ── Animation controls ── */
+  .anim-controls {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .anim-btn-group {
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  .anim-btn {
+    font-size: 11px;
+    padding: 5px 9px;
+    border-radius: 5px;
+  }
+
+  .anim-speed {
+    align-self: flex-end;
+  }
+
+  .anim-speed select {
+    font-size: 11px;
+  }
+
+  /* ── Output grammar cards: single column ── */
+  .output-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .grammar-card {
+    padding: 12px;
+  }
+
+  .rules {
+    font-size: 12px;
+    line-height: 1.8;
+    max-height: 200px;
+  }
+
+  /* ── Test row: input + buttons responsive ── */
+  .test-row {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .test-row input {
+    flex: 1 1 100%;
+  }
+
+  .test-row button {
+    flex: 1;
+    font-size: 12px;
+    padding: 9px 10px;
+  }
+
+  .verdict {
+    font-size: 12px;
+    padding: 7px 10px;
+  }
+
+  /* ── Rejection analysis ── */
+  .rejection-analysis-card {
+    padding: 12px 14px;
+  }
+
+  .rejection-columns {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  /* ── Footer ── */
+  footer {
+    margin-top: 24px;
+    font-size: 9.5px;
+    letter-spacing: 0.05em;
+    padding-bottom: 4px;
+  }
+
+  /* ── History modal: full-screen on mobile ── */
+  .history-modal-backdrop {
+    align-items: flex-end;
+    justify-content: center;
+  }
+
+  .history-modal-panel {
+    width: 100vw;
+    max-width: 100vw;
+    height: 92vh;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    transform: translateY(100%);
+    box-shadow: 0 -12px 50px rgba(0, 0, 0, 0.7);
+  }
+
+  .history-modal-backdrop.open .history-modal-panel {
+    transform: translateY(0);
+  }
+
+  /* Add a drag-handle pill at top of modal for mobile UX */
+  .history-modal-panel::before {
+    content: "";
+    display: block;
+    width: 36px;
+    height: 4px;
+    border-radius: 2px;
+    background: var(--border);
+    margin: 10px auto 0;
+    flex-shrink: 0;
+  }
+
+  .history-modal-header {
+    padding: 14px 16px 14px;
+  }
+
+  .history-modal-title {
+    font-size: 17px;
+  }
+
+  .history-modal-subtitle {
+    font-size: 11.5px;
+  }
+
+  .history-toolbar {
+    padding: 10px 16px;
+  }
+
+  .history-stats-bar {
+    padding: 8px 16px;
+    gap: 12px;
+  }
+
+  .history-list {
+    padding: 14px 16px;
+  }
+
+  .history-card {
+    padding: 12px 14px;
+    border-radius: 10px;
+  }
+
+  .history-card-title {
+    font-size: 13px;
+  }
+
+  .hist-action-load {
+    font-size: 10.5px;
+    padding: 5px 10px;
+  }
+
+  /* Toast: full-width bottom strip on mobile */
+  .history-toast {
+    bottom: max(16px, env(safe-area-inset-bottom));
+    right: 12px;
+    left: 12px;
+    border-radius: 8px;
+    justify-content: center;
+  }
+}
+
+/* ── Very small phones: ≤ 400px ── */
+@media (max-width: 400px) {
+  body {
+    padding: 10px 8px 32px;
+    padding-top: max(10px, env(safe-area-inset-top));
+    padding-bottom: max(32px, env(safe-area-inset-bottom));
+  }
+
+  h1 {
+    font-size: 17px;
+  }
+
+  .header-actions {
+    gap: 4px;
+  }
+
+  .sound-toggle-btn,
+  .loader-replay-btn,
+  .history-toggle-btn,
+  .sound-density-btn {
+    padding: 5px 7px;
+    font-size: 10px;
+  }
+
+  .theme-btn {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+
+  .panel {
+    padding: 12px 10px;
+  }
+
+  .field-row {
+    grid-template-columns: 1fr;
+  }
+
+  table.tt th,
+  table.tt td {
+    padding: 4px 5px;
+    font-size: 11px;
+  }
+
+  .anim-btn {
+    font-size: 10.5px;
+    padding: 4px 7px;
+  }
+
+  .test-row button {
+    font-size: 11.5px;
+    padding: 8px 8px;
+  }
+
+  .history-modal-panel {
+    height: 96vh;
+  }
+}
+
+/* ── Landscape phone (short viewport) ── */
+@media (max-height: 500px) and (max-width: 900px) and (orientation: landscape) {
+  body {
+    padding: 8px max(10px, env(safe-area-inset-right)) 24px max(10px, env(safe-area-inset-left));
+  }
+
+  header {
+    margin-bottom: 10px;
+  }
+
+  .header-top {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  h1 {
+    font-size: 18px;
+  }
+
+  .subtitle {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: minmax(280px, 380px) 1fr;
+    gap: 12px;
+  }
+
+  .panel {
+    padding: 10px 12px;
+  }
+
+  .panel-desc {
+    display: none;
+  }
+
+  #diagram-wrap svg {
+    height: 200px;
+  }
+
+  .history-modal-panel {
+    width: 70vw;
+    height: 100vh;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    transform: translateX(100%);
+    border-left: 1px solid var(--border);
+    border-top: none;
+  }
+
+  .history-modal-panel::before {
+    display: none;
+  }
+
+  .history-modal-backdrop.open .history-modal-panel {
+    transform: translateX(0);
+  }
+}
+
