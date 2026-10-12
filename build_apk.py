@@ -20,8 +20,8 @@ PWA_HOST     = _parsed.netloc                  # "ankitbhisikar.github.io"
 PWA_PATH     = _parsed.path                    # "/FA-Regular-Grammar-Engine/"
 PKG_NAME     = "com.ankitbhisikar.fagrammarengine"
 APP_NAME     = "FA Grammar Engine"
-VERSION      = "1.0.0"
-VERSION_CODE = 1
+VERSION      = "1.4.0"
+VERSION_CODE = 4
 OUT_ZIP      = "fa-grammar-signed.zip"
 OUT_APK      = "fa-grammar-signed.apk"
 

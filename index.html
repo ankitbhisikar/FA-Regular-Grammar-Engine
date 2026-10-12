@@ -123,6 +123,10 @@
       <div class="header-top">
         <div class="eyebrow">Theory of Computation · Compiler Utility</div>
         <div class="header-actions">
+          <button type="button" class="server-status-btn" id="serverStatusBtn" title="Real-Time Python Backend Engine Status (Click to test / reconnect)">
+            <span class="server-pill-dot" id="serverPillDot"></span>
+            <span id="serverPillText">Server: Checking...</span>
+          </button>
           <button type="button" class="history-toggle-btn" id="historyToggleBtn" title="View Recent Automata & Grammar History (SQL/Python/Local)">
             <span class="history-icon">📜</span> History <span class="history-badge" id="historyBadge">0</span>
           </button>
@@ -167,11 +171,25 @@
           <div class="field">
             <label for="presetSelect">Classic DFA Presets</label>
             <select id="presetSelect">
-              <option value="ends_01" selected>Ends with "01" (3 states)</option>
-              <option value="even_0">Even number of 0s (2 states)</option>
-              <option value="contains_101">Contains substring "101" (4 states)</option>
-              <option value="div_3">Binary number divisible by 3 (3 states)</option>
-              <option value="alternating">Alternating 0s and 1s (4 states)</option>
+              <option value="__custom__">✨ Customize Machine (Live Real-Time Generator)...</option>
+              <optgroup label="── Classic Patterns ──">
+                <option value="ends_01" selected>Ends with "01" (3 states)</option>
+                <option value="even_0">Even number of 0s (2 states)</option>
+                <option value="contains_101">Contains substring "101" (4 states)</option>
+                <option value="alternating">Alternating 0s and 1s (4 states)</option>
+              </optgroup>
+              <optgroup label="── Divisible By (Binary) ──">
+                <option value="div_2">Divisible by 2 (2 states)</option>
+                <option value="div_3">Divisible by 3 (3 states)</option>
+                <option value="div_4">Divisible by 4 (4 states)</option>
+                <option value="div_5">Divisible by 5 (5 states)</option>
+              </optgroup>
+              <optgroup label="── NOT Divisible By (Binary) ──">
+                <option value="not_div_2">NOT Divisible by 2 (2 states)</option>
+                <option value="not_div_3">NOT Divisible by 3 (3 states)</option>
+                <option value="not_div_4">NOT Divisible by 4 (4 states)</option>
+                <option value="not_div_5">NOT Divisible by 5 (5 states)</option>
+              </optgroup>
             </select>
           </div>
 
@@ -262,6 +280,230 @@
     </div>
 
     <footer>DFA CONFIG → δ TRANSCRIPTION → REGULAR GRAMMAR (G_R, G_L)</footer>
+  </div>
+
+  <!-- ============================================================
+       REAL-TIME AUTOMATA & GRAMMAR CUSTOMIZER MODAL
+       ============================================================ -->
+  <div id="customizerModal" class="custom-modal-backdrop" aria-hidden="true">
+    <div class="custom-modal-panel" role="dialog" aria-modal="true" aria-labelledby="customModalTitle">
+      
+      <!-- Modal Header -->
+      <div class="custom-modal-header">
+        <div>
+          <div class="custom-eyebrow">
+            <span class="custom-status-indicator" id="customServerIndicator"></span>
+            <span id="customServerStatusText">Real-Time Engine: Probing...</span>
+          </div>
+          <h2 class="custom-modal-title" id="customModalTitle">Real-Time Automata Customizer</h2>
+          <p class="custom-modal-subtitle">Synthesize any custom finite automata (divisibility, patterns, modulo) and derive equivalent regular grammars in real-time.</p>
+        </div>
+        <button type="button" class="custom-close-btn" id="customCloseBtn" title="Close Customizer (&times; or Esc)">&times;</button>
+      </div>
+
+      <!-- Engine Selector Tabs -->
+      <div class="custom-tabs-bar">
+        <button type="button" class="custom-tab-btn active" data-tab="divisibility">
+          <span class="tab-icon">🔢</span> Divisibility (Mod N)
+        </button>
+        <button type="button" class="custom-tab-btn" data-tab="patterns">
+          <span class="tab-icon">🔤</span> Substring &amp; Patterns
+        </button>
+        <button type="button" class="custom-tab-btn" data-tab="count">
+          <span class="tab-icon">🎯</span> Count Modulo (k)
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="custom-modal-body">
+
+        <!-- TAB 1: DIVISIBILITY -->
+        <div class="custom-tab-content active" id="tabDivisibility">
+          <div class="custom-section">
+            <label class="custom-label">Divisor (N)</label>
+            <div class="custom-slider-row">
+              <input type="range" id="custDivisorRange" min="1" max="16" value="4" class="custom-range">
+              <div class="custom-num-badge">
+                <span>N = </span><strong id="custDivisorVal">4</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="custom-section">
+            <label class="custom-label">Acceptance Condition</label>
+            <div class="custom-chips-grid">
+              <button type="button" class="custom-chip active" data-cond="divisible">
+                <span class="chip-dot dot-div"></span>
+                <span class="chip-title">Divisible by N</span>
+                <span class="chip-desc">Remainder = 0</span>
+              </button>
+              <button type="button" class="custom-chip" data-cond="not_divisible">
+                <span class="chip-dot dot-not"></span>
+                <span class="chip-title">NOT Divisible by N</span>
+                <span class="chip-desc">Remainder &ne; 0</span>
+              </button>
+              <button type="button" class="custom-chip" data-cond="remainder">
+                <span class="chip-dot dot-rem"></span>
+                <span class="chip-title">Custom Remainder</span>
+                <span class="chip-desc">Remainder = k</span>
+              </button>
+            </div>
+            
+            <div class="custom-subfield" id="custRemField" style="display:none; margin-top: 12px;">
+              <label for="custTargetRem">Target Remainder (k):</label>
+              <input type="number" id="custTargetRem" min="0" max="15" value="1" class="custom-input-sm">
+            </div>
+          </div>
+
+          <div class="custom-section">
+            <label class="custom-label">Number Base &amp; Alphabet (&Sigma;)</label>
+            <div class="custom-base-grid">
+              <button type="button" class="custom-base-btn active" data-base="2">
+                <strong>Binary (Base 2)</strong>
+                <code>&Sigma; = {0, 1}</code>
+              </button>
+              <button type="button" class="custom-base-btn" data-base="10">
+                <strong>Decimal (Base 10)</strong>
+                <code>&Sigma; = {0..9}</code>
+              </button>
+              <button type="button" class="custom-base-btn" data-base="3">
+                <strong>Ternary (Base 3)</strong>
+                <code>&Sigma; = {0, 1, 2}</code>
+              </button>
+              <button type="button" class="custom-base-btn" data-base="16">
+                <strong>Hex (Base 16)</strong>
+                <code>&Sigma; = {0..9, A..F}</code>
+              </button>
+            </div>
+          </div>
+
+          <div class="custom-formula-box">
+            <span class="formula-label">Theoretical State Transition Law:</span>
+            <code>&delta;(q<sub>i</sub>, b) = q<sub>(i &middot; Base + val(b)) mod N</sub></code>
+          </div>
+        </div>
+
+        <!-- TAB 2: PATTERNS & SUBSTRINGS -->
+        <div class="custom-tab-content" id="tabPatterns" style="display:none;">
+          <div class="custom-section">
+            <label for="custPatternInput" class="custom-label">Target Pattern String</label>
+            <input type="text" id="custPatternInput" value="101" placeholder="e.g. 101 or 01" class="custom-input-lg">
+          </div>
+
+          <div class="custom-section">
+            <label class="custom-label">Pattern Matching Mode</label>
+            <div class="custom-chips-grid">
+              <button type="button" class="custom-chip active" data-pat-type="contains">
+                <span class="chip-title">Contains Substring</span>
+                <span class="chip-desc">Matches w = uPv</span>
+              </button>
+              <button type="button" class="custom-chip" data-pat-type="ends_with">
+                <span class="chip-title">Ends With</span>
+                <span class="chip-desc">Matches w = uP</span>
+              </button>
+              <button type="button" class="custom-chip" data-pat-type="starts_with">
+                <span class="chip-title">Starts With</span>
+                <span class="chip-desc">Matches w = Pv</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="custom-section">
+            <label class="custom-checkbox-row">
+              <input type="checkbox" id="custPatternNegate">
+              <span><strong>Complement / Invert (NOT version):</strong> Accept strings that do <em>NOT</em> match this pattern</span>
+            </label>
+          </div>
+
+          <div class="custom-section">
+            <label for="custPatternAlpha" class="custom-label">Alphabet (&Sigma;)</label>
+            <input type="text" id="custPatternAlpha" value="0,1" placeholder="e.g. 0,1 or a,b" class="custom-input-sm">
+          </div>
+        </div>
+
+        <!-- TAB 3: COUNT MODULO -->
+        <div class="custom-tab-content" id="tabCount" style="display:none;">
+          <div class="custom-section">
+            <label for="custCountSymbol" class="custom-label">Symbol to Count</label>
+            <input type="text" id="custCountSymbol" value="0" maxlength="3" class="custom-input-sm" style="width: 80px;">
+          </div>
+
+          <div class="custom-section">
+            <label class="custom-label">Modulo Divisor (k)</label>
+            <div class="custom-slider-row">
+              <input type="range" id="custCountModRange" min="2" max="8" value="2" class="custom-range">
+              <div class="custom-num-badge">
+                <span>k = </span><strong id="custCountModVal">2</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="custom-section">
+            <label for="custCountRem" class="custom-label">Target Remainder</label>
+            <div class="custom-chips-grid" id="custCountRemChips">
+              <button type="button" class="custom-chip active" data-rem-val="0">
+                <span class="chip-title">Even (rem = 0)</span>
+                <span class="chip-desc">count mod k == 0</span>
+              </button>
+              <button type="button" class="custom-chip" data-rem-val="1">
+                <span class="chip-title">Odd / rem = 1</span>
+                <span class="chip-desc">count mod k == 1</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="custom-section">
+            <label for="custCountAlpha" class="custom-label">Alphabet (&Sigma;)</label>
+            <input type="text" id="custCountAlpha" value="0,1" class="custom-input-sm">
+          </div>
+        </div>
+
+        <!-- LIVE PREVIEW CARD -->
+        <div class="custom-preview-card">
+          <div class="preview-head">
+            <div class="preview-badge">REAL-TIME PREVIEW</div>
+            <span class="preview-title" id="custPreviewTitle">Divisible by 4 (Base 2, 4 States)</span>
+          </div>
+          <div class="preview-meta-grid">
+            <div class="preview-meta-item">
+              <span class="meta-label">States (Q):</span>
+              <span class="meta-val" id="custPreviewStates">q0, q1, q2, q3 (4 states)</span>
+            </div>
+            <div class="preview-meta-item">
+              <span class="meta-label">Start:</span>
+              <span class="meta-val" id="custPreviewStart">q0</span>
+            </div>
+            <div class="preview-meta-item">
+              <span class="meta-label">Finals (F):</span>
+              <span class="meta-val val-accept" id="custPreviewFinals">q0</span>
+            </div>
+            <div class="preview-meta-item">
+              <span class="meta-label">Sample String:</span>
+              <code class="meta-code" id="custPreviewSample">100</code>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="custom-modal-footer">
+        <div class="footer-engine-indicator">
+          <span class="engine-dot" id="custEngineDot"></span>
+          <span id="custEngineModeLabel">Dual Engine: Server + Client Fallback</span>
+        </div>
+        <div class="footer-btn-group">
+          <button type="button" class="btn-ghost" id="custCancelBtn">Cancel</button>
+          <button type="button" class="btn-server-gen" id="custServerGenBtn" title="Request compilation directly from Python server">
+            <span>⚡</span> Server Real-Time
+          </button>
+          <button type="button" class="btn-primary" id="custApplyBtn">
+            Apply to Workspace →
+          </button>
+        </div>
+      </div>
+
+    </div>
   </div>
 
   <!-- ============================================================

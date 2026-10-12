@@ -2185,7 +2185,9 @@ const historyManager = {
 window.historyManager = historyManager;
 
 // Classic Theoretical DFA Presets
+// Divisibility DFAs use remainder states: δ(qᵢ, b) = q₍₂ᵢ₊ᵦ₎ mod N
 const PRESETS = {
+  // ─── Classic Patterns ───
   ends_01: {
     name: 'Ends with "01"',
     n: 3,
@@ -2225,19 +2227,6 @@ const PRESETS = {
     },
     sampleString: '001010'
   },
-  div_3: {
-    name: 'Binary number divisible by 3',
-    n: 3,
-    alphabet: ['0', '1'],
-    start: 'q0',
-    finals: ['q0'],
-    trans: {
-      q0: { '0': 'q0', '1': 'q1' },
-      q1: { '0': 'q2', '1': 'q0' },
-      q2: { '0': 'q1', '1': 'q2' }
-    },
-    sampleString: '110'
-  },
   alternating: {
     name: 'Alternating 0s and 1s',
     n: 4,
@@ -2251,13 +2240,755 @@ const PRESETS = {
       q3: { '0': 'q3', '1': 'q3' }
     },
     sampleString: '0101'
+  },
+
+  // ─── Divisible By N (Binary) ───
+  // Each state qᵢ represents remainder i when dividing the binary number read so far by N.
+  // Transition: on reading bit b, new remainder = (2 * current_remainder + b) mod N.
+  // Accept state: q0 (remainder 0 → divisible).
+
+  div_2: {
+    name: 'Binary divisible by 2',
+    n: 2,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q0'],
+    // q0 = remainder 0, q1 = remainder 1
+    // δ(q0,0) = (2*0+0)%2 = 0 → q0, δ(q0,1) = (2*0+1)%2 = 1 → q1
+    // δ(q1,0) = (2*1+0)%2 = 0 → q0, δ(q1,1) = (2*1+1)%2 = 1 → q1
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q0', '1': 'q1' }
+    },
+    sampleString: '110'   // 6 → divisible by 2 ✓
+  },
+  div_3: {
+    name: 'Binary divisible by 3',
+    n: 3,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q0'],
+    // q0 = rem 0, q1 = rem 1, q2 = rem 2
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q2', '1': 'q0' },
+      q2: { '0': 'q1', '1': 'q2' }
+    },
+    sampleString: '110'   // 6 → divisible by 3 ✓
+  },
+  div_4: {
+    name: 'Binary divisible by 4',
+    n: 4,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q0'],
+    // q0 = rem 0, q1 = rem 1, q2 = rem 2, q3 = rem 3
+    // δ(q0,0)=(0)%4=0→q0, δ(q0,1)=(1)%4=1→q1
+    // δ(q1,0)=(2)%4=2→q2, δ(q1,1)=(3)%4=3→q3
+    // δ(q2,0)=(4)%4=0→q0, δ(q2,1)=(5)%4=1→q1
+    // δ(q3,0)=(6)%4=2→q2, δ(q3,1)=(7)%4=3→q3
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q2', '1': 'q3' },
+      q2: { '0': 'q0', '1': 'q1' },
+      q3: { '0': 'q2', '1': 'q3' }
+    },
+    sampleString: '1100'  // 12 → divisible by 4 ✓
+  },
+  div_5: {
+    name: 'Binary divisible by 5',
+    n: 5,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q0'],
+    // q0=rem0, q1=rem1, q2=rem2, q3=rem3, q4=rem4
+    // δ(q0,0)=(0)%5=0→q0, δ(q0,1)=(1)%5=1→q1
+    // δ(q1,0)=(2)%5=2→q2, δ(q1,1)=(3)%5=3→q3
+    // δ(q2,0)=(4)%5=4→q4, δ(q2,1)=(5)%5=0→q0
+    // δ(q3,0)=(6)%5=1→q1, δ(q3,1)=(7)%5=2→q2
+    // δ(q4,0)=(8)%5=3→q3, δ(q4,1)=(9)%5=4→q4
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q2', '1': 'q3' },
+      q2: { '0': 'q4', '1': 'q0' },
+      q3: { '0': 'q1', '1': 'q2' },
+      q4: { '0': 'q3', '1': 'q4' }
+    },
+    sampleString: '1010'  // 10 → divisible by 5 ✓
+  },
+
+  // ─── NOT Divisible By N (Binary) ───
+  // Same DFA structure as divisible, but accept states are all non-zero remainders.
+
+  not_div_2: {
+    name: 'Binary NOT divisible by 2',
+    n: 2,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q1'],
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q0', '1': 'q1' }
+    },
+    sampleString: '111'   // 7 → not divisible by 2 ✓
+  },
+  not_div_3: {
+    name: 'Binary NOT divisible by 3',
+    n: 3,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q1', 'q2'],
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q2', '1': 'q0' },
+      q2: { '0': 'q1', '1': 'q2' }
+    },
+    sampleString: '101'   // 5 → not divisible by 3 ✓
+  },
+  not_div_4: {
+    name: 'Binary NOT divisible by 4',
+    n: 4,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q1', 'q2', 'q3'],
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q2', '1': 'q3' },
+      q2: { '0': 'q0', '1': 'q1' },
+      q3: { '0': 'q2', '1': 'q3' }
+    },
+    sampleString: '101'   // 5 → not divisible by 4 ✓
+  },
+  not_div_5: {
+    name: 'Binary NOT divisible by 5',
+    n: 5,
+    alphabet: ['0', '1'],
+    start: 'q0',
+    finals: ['q1', 'q2', 'q3', 'q4'],
+    trans: {
+      q0: { '0': 'q0', '1': 'q1' },
+      q1: { '0': 'q2', '1': 'q3' },
+      q2: { '0': 'q4', '1': 'q0' },
+      q3: { '0': 'q1', '1': 'q2' },
+      q4: { '0': 'q3', '1': 'q4' }
+    },
+    sampleString: '111'   // 7 → not divisible by 5 ✓
   }
 };
+
+// =====================================================================
+// REAL-TIME AUTOMATA CUSTOMIZER & BACKEND SERVER CONTROLLER
+// =====================================================================
+const customAutomataManager = {
+  modalEl: null,
+  activeTab: 'divisibility',
+  serverOnline: false,
+  apiStatusEndpoint: '/api/status',
+  apiGenerateEndpoint: '/api/generate-machine',
+  pingInterval: null,
+
+  // Divisibility parameters
+  divN: 4,
+  divCondition: 'divisible',
+  divTargetRem: 1,
+  divBase: 2,
+
+  // Substring pattern parameters
+  patString: '101',
+  patType: 'contains',
+  patNegate: false,
+  patAlpha: '0,1',
+
+  // Count modulo parameters
+  countSymbol: '0',
+  countMod: 2,
+  countRem: 0,
+  countAlpha: '0,1',
+
+  init() {
+    this.modalEl = document.getElementById('customizerModal');
+    this.bindEvents();
+    this.checkServerStatus();
+
+    // Periodic live health check every 12 seconds
+    this.pingInterval = setInterval(() => this.checkServerStatus(), 12000);
+    this.updatePreview();
+  },
+
+  bindEvents() {
+    // Open modal buttons
+    const openBtn = document.getElementById('openCustomizerBtn');
+    if (openBtn) {
+      openBtn.addEventListener('click', () => this.open());
+    }
+
+    const serverStatusBtn = document.getElementById('serverStatusBtn');
+    if (serverStatusBtn) {
+      serverStatusBtn.addEventListener('click', () => {
+        this.checkServerStatus(true);
+      });
+    }
+
+    // Close buttons
+    const closeBtn = document.getElementById('customCloseBtn');
+    if (closeBtn) closeBtn.addEventListener('click', () => this.close());
+
+    const cancelBtn = document.getElementById('custCancelBtn');
+    if (cancelBtn) cancelBtn.addEventListener('click', () => this.close());
+
+    if (this.modalEl) {
+      this.modalEl.addEventListener('click', (e) => {
+        if (e.target === this.modalEl) this.close();
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.modalEl && this.modalEl.classList.contains('open')) {
+        this.close();
+      }
+    });
+
+    // Tab buttons
+    document.querySelectorAll('.custom-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.dataset.tab;
+        this.switchTab(tab);
+      });
+    });
+
+    // Divisibility controls
+    const divRange = document.getElementById('custDivisorRange');
+    const divVal = document.getElementById('custDivisorVal');
+    if (divRange) {
+      divRange.addEventListener('input', (e) => {
+        this.divN = parseInt(e.target.value, 10);
+        if (divVal) divVal.textContent = this.divN;
+        const targetRemInput = document.getElementById('custTargetRem');
+        if (targetRemInput) targetRemInput.max = Math.max(0, this.divN - 1);
+        this.updatePreview();
+      });
+    }
+
+    document.querySelectorAll('[data-cond]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-cond]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        this.divCondition = chip.dataset.cond;
+        const remField = document.getElementById('custRemField');
+        if (remField) {
+          remField.style.display = this.divCondition === 'remainder' ? 'block' : 'none';
+        }
+        this.updatePreview();
+      });
+    });
+
+    const targetRemInput = document.getElementById('custTargetRem');
+    if (targetRemInput) {
+      targetRemInput.addEventListener('input', (e) => {
+        this.divTargetRem = parseInt(e.target.value, 10) || 0;
+        this.updatePreview();
+      });
+    }
+
+    document.querySelectorAll('[data-base]').forEach(baseBtn => {
+      baseBtn.addEventListener('click', () => {
+        document.querySelectorAll('[data-base]').forEach(b => b.classList.remove('active'));
+        baseBtn.classList.add('active');
+        this.divBase = parseInt(baseBtn.dataset.base, 10);
+        this.updatePreview();
+      });
+    });
+
+    // Pattern controls
+    const patInput = document.getElementById('custPatternInput');
+    if (patInput) {
+      patInput.addEventListener('input', (e) => {
+        this.patString = e.target.value;
+        this.updatePreview();
+      });
+    }
+
+    document.querySelectorAll('[data-pat-type]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.querySelectorAll('[data-pat-type]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        this.patType = chip.dataset.patType;
+        this.updatePreview();
+      });
+    });
+
+    const patNegate = document.getElementById('custPatternNegate');
+    if (patNegate) {
+      patNegate.addEventListener('change', (e) => {
+        this.patNegate = e.target.checked;
+        this.updatePreview();
+      });
+    }
+
+    const patAlpha = document.getElementById('custPatternAlpha');
+    if (patAlpha) {
+      patAlpha.addEventListener('input', (e) => {
+        this.patAlpha = e.target.value;
+        this.updatePreview();
+      });
+    }
+
+    // Count modulo controls
+    const countSym = document.getElementById('custCountSymbol');
+    if (countSym) {
+      countSym.addEventListener('input', (e) => {
+        this.countSymbol = e.target.value || '0';
+        this.updatePreview();
+      });
+    }
+
+    const countModRange = document.getElementById('custCountModRange');
+    const countModVal = document.getElementById('custCountModVal');
+    if (countModRange) {
+      countModRange.addEventListener('input', (e) => {
+        this.countMod = parseInt(e.target.value, 10);
+        if (countModVal) countModVal.textContent = this.countMod;
+        this.renderCountRemChips();
+        this.updatePreview();
+      });
+    }
+
+    const countAlpha = document.getElementById('custCountAlpha');
+    if (countAlpha) {
+      countAlpha.addEventListener('input', (e) => {
+        this.countAlpha = e.target.value;
+        this.updatePreview();
+      });
+    }
+
+    // Action buttons
+    const applyBtn = document.getElementById('custApplyBtn');
+    if (applyBtn) {
+      applyBtn.addEventListener('click', () => this.applyCurrentToWorkspace(this.serverOnline ? 'server' : 'client'));
+    }
+
+    const serverGenBtn = document.getElementById('custServerGenBtn');
+    if (serverGenBtn) {
+      serverGenBtn.addEventListener('click', () => this.applyCurrentToWorkspace('server'));
+    }
+  },
+
+  async checkServerStatus(manualTrigger = false) {
+    const pillDot = document.getElementById('serverPillDot');
+    const pillText = document.getElementById('serverPillText');
+    const custIndicator = document.getElementById('customServerIndicator');
+    const custStatusText = document.getElementById('customServerStatusText');
+    const engineDot = document.getElementById('custEngineDot');
+    const engineModeLabel = document.getElementById('custEngineModeLabel');
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      const res = await fetch(this.apiStatusEndpoint, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.status === 'ok') {
+          this.serverOnline = true;
+          if (pillDot) pillDot.className = 'server-pill-dot online';
+          if (pillText) pillText.textContent = 'Server: Online (2.0)';
+          if (custIndicator) custIndicator.className = 'custom-status-indicator online';
+          if (custStatusText) custStatusText.textContent = '🟢 Server Real-Time Engine Connected';
+          if (engineDot) engineDot.style.background = '#10B981';
+          if (engineModeLabel) engineModeLabel.textContent = '⚡ Server Real-Time Engine Active';
+
+          if (manualTrigger && typeof historyManager !== 'undefined') {
+            historyManager.showToast('🟢 Python Real-Time Server Connected');
+          }
+          return;
+        }
+      }
+    } catch (e) {
+      // Backend not running on origin
+    }
+
+    this.serverOnline = false;
+    if (pillDot) pillDot.className = 'server-pill-dot offline';
+    if (pillText) pillText.textContent = 'Server: Local Mode';
+    if (custIndicator) custIndicator.className = 'custom-status-indicator';
+    if (custStatusText) custStatusText.textContent = '💻 Client Engine (Run python server.py for API)';
+    if (engineDot) engineDot.style.background = '#F59E0B';
+    if (engineModeLabel) engineModeLabel.textContent = '💻 Client-Side Engine Active (Offline Fallback)';
+
+    if (manualTrigger && typeof historyManager !== 'undefined') {
+      historyManager.showToast('🔵 Running in Client Mode (Start server.py for Backend)');
+    }
+  },
+
+  open() {
+    if (!this.modalEl) return;
+    this.modalEl.classList.add('open');
+    this.modalEl.setAttribute('aria-hidden', 'false');
+    this.checkServerStatus();
+    this.updatePreview();
+  },
+
+  close() {
+    if (!this.modalEl) return;
+    this.modalEl.classList.remove('open');
+    this.modalEl.setAttribute('aria-hidden', 'true');
+    // Reset preset dropdown selection if it was left on __custom__
+    const presetSelect = document.getElementById('presetSelect');
+    if (presetSelect && presetSelect.value === '__custom__') {
+      presetSelect.selectedIndex = 1;
+    }
+  },
+
+  switchTab(tabName) {
+    this.activeTab = tabName;
+    document.querySelectorAll('.custom-tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === tabName);
+    });
+
+    const tabMap = {
+      divisibility: 'tabDivisibility',
+      patterns: 'tabPatterns',
+      count: 'tabCount'
+    };
+
+    Object.entries(tabMap).forEach(([key, id]) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.style.display = key === tabName ? 'block' : 'none';
+      }
+    });
+
+    this.updatePreview();
+  },
+
+  renderCountRemChips() {
+    const container = document.getElementById('custCountRemChips');
+    if (!container) return;
+    const K = this.countMod;
+    let html = '';
+    for (let r = 0; r < K; r++) {
+      const label = r === 0 ? `Even / rem=0` : (r === 1 && K === 2 ? `Odd / rem=1` : `rem = ${r}`);
+      const isActive = r === this.countRem ? 'active' : '';
+      html += `<button type="button" class="custom-chip ${isActive}" data-rem-val="${r}">
+        <span class="chip-title">${label}</span>
+        <span class="chip-desc">count % ${K} == ${r}</span>
+      </button>`;
+    }
+    container.innerHTML = html;
+    container.querySelectorAll('[data-rem-val]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        container.querySelectorAll('[data-rem-val]').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        this.countRem = parseInt(chip.dataset.remVal, 10);
+        this.updatePreview();
+      });
+    });
+  },
+
+  updatePreview() {
+    const dfa = this.buildActiveDFAClient();
+    const titleEl = document.getElementById('custPreviewTitle');
+    const statesEl = document.getElementById('custPreviewStates');
+    const startEl = document.getElementById('custPreviewStart');
+    const finalsEl = document.getElementById('custPreviewFinals');
+    const sampleEl = document.getElementById('custPreviewSample');
+
+    if (titleEl) titleEl.textContent = dfa.title;
+    if (statesEl) statesEl.textContent = `${dfa.states.join(', ')} (${dfa.num_states} states)`;
+    if (startEl) startEl.textContent = dfa.start;
+    if (finalsEl) finalsEl.textContent = dfa.finals.length > 0 ? dfa.finals.join(', ') : '∅ (none)';
+    if (sampleEl) sampleEl.textContent = dfa.sample_string || 'ε';
+  },
+
+  buildActiveDFAClient() {
+    if (this.activeTab === 'divisibility') {
+      return this.generateDivisibilityDFA(this.divN, this.divBase, this.divCondition, this.divTargetRem);
+    } else if (this.activeTab === 'patterns') {
+      const alpha = this.patAlpha.split(',').map(s => s.trim()).filter(Boolean);
+      return this.generatePatternDFA(this.patType, this.patString || '01', alpha.length ? alpha : ['0', '1'], this.patNegate);
+    } else {
+      const alpha = this.countAlpha.split(',').map(s => s.trim()).filter(Boolean);
+      return this.generateCountModDFA(this.countSymbol, this.countMod, this.countRem, alpha.length ? alpha : ['0', '1']);
+    }
+  },
+
+  generateDivisibilityDFA(divisor, base = 2, condition = 'divisible', targetRem = 0) {
+    const N = Math.max(1, parseInt(divisor, 10));
+    let alphabet = ['0', '1'];
+    if (base === 10) alphabet = ['0','1','2','3','4','5','6','7','8','9'];
+    else if (base === 3) alphabet = ['0','1','2'];
+    else if (base === 16) alphabet = ['0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'];
+
+    const states = Array.from({ length: N }, (_, i) => `q${i}`);
+    const start = 'q0';
+    const trans = {};
+
+    function charVal(c) {
+      if (c >= '0' && c <= '9') return parseInt(c, 10);
+      const code = c.toUpperCase().charCodeAt(0);
+      if (code >= 65 && code <= 70) return 10 + (code - 65);
+      return 0;
+    }
+
+    for (let i = 0; i < N; i++) {
+      const q = `q${i}`;
+      trans[q] = {};
+      alphabet.forEach(sym => {
+        const v = charVal(sym);
+        const nextRem = (i * base + v) % N;
+        trans[q][sym] = `q${nextRem}`;
+      });
+    }
+
+    let finals = ['q0'];
+    let condTitle = `Divisible by ${N}`;
+    if (condition === 'not_divisible') {
+      finals = states.filter(s => s !== 'q0');
+      condTitle = `NOT Divisible by ${N}`;
+    } else if (condition === 'remainder') {
+      const rem = targetRem % N;
+      finals = [`q${rem}`];
+      condTitle = `Remainder = ${rem} (mod ${N})`;
+    }
+
+    // Sample string in given base
+    let sampleVal = 0;
+    if (condition === 'divisible') {
+      sampleVal = N > 1 ? N : 0;
+    } else if (condition === 'not_divisible') {
+      sampleVal = N > 1 ? 1 : 0;
+    } else {
+      sampleVal = targetRem % N;
+    }
+
+    let sampleStr = sampleVal.toString(base).toUpperCase();
+    if (!sampleStr) sampleStr = alphabet[0];
+
+    return {
+      title: `${condTitle} (Base ${base}, ${N} States)`,
+      num_states: N,
+      states,
+      alphabet,
+      start,
+      finals,
+      transitions: trans,
+      sample_string: sampleStr
+    };
+  },
+
+  generatePatternDFA(type, pattern, alphabet, negate = false) {
+    const pat = pattern || '01';
+    const m = pat.length;
+    const states = Array.from({ length: m + 1 }, (_, i) => `q${i}`);
+    const start = 'q0';
+    const trans = {};
+
+    if (type === 'ends_with') {
+      for (let i = 0; i <= m; i++) {
+        const q = `q${i}`;
+        trans[q] = {};
+        const prefix = pat.substring(0, i);
+        alphabet.forEach(a => {
+          const cand = prefix + a;
+          let k = Math.min(m, cand.length);
+          while (k > 0) {
+            if (cand.endsWith(pat.substring(0, k))) break;
+            k--;
+          }
+          trans[q][a] = `q${k}`;
+        });
+      }
+      const finalState = `q${m}`;
+      const finals = states.filter(s => negate ? s !== finalState : s === finalState);
+      return {
+        title: `${negate ? 'NOT ' : ''}Ends with "${pat}"`,
+        num_states: states.length,
+        states,
+        alphabet,
+        start,
+        finals,
+        transitions: trans,
+        sample_string: pat
+      };
+    } else if (type === 'starts_with') {
+      const trap = `q${m + 1}`;
+      states.push(trap);
+      for (let i = 0; i < m; i++) {
+        const q = `q${i}`;
+        trans[q] = {};
+        alphabet.forEach(a => {
+          trans[q][a] = (a === pat[i]) ? `q${i + 1}` : trap;
+        });
+      }
+      const qm = `q${m}`;
+      trans[qm] = {};
+      alphabet.forEach(a => trans[qm][a] = qm);
+      trans[trap] = {};
+      alphabet.forEach(a => trans[trap][a] = trap);
+
+      const finals = states.filter(s => negate ? s !== qm : s === qm);
+      return {
+        title: `${negate ? 'NOT ' : ''}Starts with "${pat}"`,
+        num_states: states.length,
+        states,
+        alphabet,
+        start,
+        finals,
+        transitions: trans,
+        sample_string: pat
+      };
+    } else { // contains
+      for (let i = 0; i < m; i++) {
+        const q = `q${i}`;
+        trans[q] = {};
+        const prefix = pat.substring(0, i);
+        alphabet.forEach(a => {
+          const cand = prefix + a;
+          let k = Math.min(m, cand.length);
+          while (k > 0) {
+            if (cand.endsWith(pat.substring(0, k))) break;
+            k--;
+          }
+          trans[q][a] = `q${k}`;
+        });
+      }
+      const qm = `q${m}`;
+      trans[qm] = {};
+      alphabet.forEach(a => trans[qm][a] = qm);
+
+      const finals = states.filter(s => negate ? s !== qm : s === qm);
+      return {
+        title: `${negate ? 'NOT ' : ''}Contains substring "${pat}"`,
+        num_states: states.length,
+        states,
+        alphabet,
+        start,
+        finals,
+        transitions: trans,
+        sample_string: pat
+      };
+    }
+  },
+
+  generateCountModDFA(symbol, mod = 2, remainder = 0, alphabet = ['0', '1']) {
+    const K = Math.max(1, parseInt(mod, 10));
+    const target = remainder % K;
+    const states = Array.from({ length: K }, (_, i) => `q${i}`);
+    const start = 'q0';
+    const trans = {};
+
+    for (let i = 0; i < K; i++) {
+      const q = `q${i}`;
+      trans[q] = {};
+      alphabet.forEach(a => {
+        trans[q][a] = (a === symbol) ? `q${(i + 1) % K}` : q;
+      });
+    }
+
+    const finals = [`q${target}`];
+    return {
+      title: `Count of '${symbol}' mod ${K} = ${target}`,
+      num_states: K,
+      states,
+      alphabet,
+      start,
+      finals,
+      transitions: trans,
+      sample_string: symbol.repeat(target)
+    };
+  },
+
+  async applyCurrentToWorkspace(source = 'client') {
+    let dfa = null;
+    let usedSource = 'client';
+
+    if (source === 'server' && this.serverOnline) {
+      try {
+        const payload = {
+          type: this.activeTab,
+          divisor: this.divN,
+          base: this.divBase,
+          condition: this.divCondition,
+          target_remainder: this.divTargetRem,
+          pattern: this.patString,
+          negate: this.patNegate,
+          symbol: this.countSymbol,
+          mod: this.countMod,
+          remainder: this.countRem,
+          alphabet: (this.activeTab === 'patterns' ? this.patAlpha : (this.activeTab === 'count' ? this.countAlpha : null))
+        };
+
+        const res = await fetch(this.apiGenerateEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.machine) {
+            dfa = data.machine;
+            usedSource = 'server';
+          }
+        }
+      } catch (err) {
+        console.warn('[Customizer] Server generation warning, falling back to client:', err);
+      }
+    }
+
+    if (!dfa) {
+      dfa = this.buildActiveDFAClient();
+      usedSource = 'client';
+    }
+
+    // Apply to workspace configuration
+    cfg.n = dfa.num_states;
+    cfg.alphabet = [...dfa.alphabet];
+    cfg.start = dfa.start;
+    cfg.finals = new Set(dfa.finals);
+    window.__lastTrans = JSON.parse(JSON.stringify(dfa.transitions));
+
+    // Update input controls
+    const numStatesInput = document.getElementById('numStates');
+    if (numStatesInput) numStatesInput.value = dfa.num_states;
+
+    const alphabetInput = document.getElementById('alphabet');
+    if (alphabetInput) alphabetInput.value = dfa.alphabet.join(',');
+
+    const testStrInput = document.getElementById('testString');
+    if (testStrInput) testStrInput.value = dfa.sample_string || '';
+
+    // Rebuild table & generate linear regular grammars
+    buildTable();
+    generate();
+
+    // Visual & audio feedback
+    if (typeof soundEngine !== 'undefined' && soundEngine.play) {
+      soundEngine.play('enter');
+    }
+
+    this.close();
+
+    if (typeof historyManager !== 'undefined') {
+      const srcLabel = usedSource === 'server' ? '⚡ Python Server' : '✨ Real-Time Engine';
+      historyManager.showToast(`Synthesized ${dfa.title} via ${srcLabel}`);
+      historyManager.recordSnapshot('customizer', '');
+    }
+  }
+};
+
+window.customAutomataManager = customAutomataManager;
 
 /**
  * Loads a classic DFA preset and regenerates the table, grammars, and diagram.
  */
 function loadPreset(presetKey) {
+  if (presetKey === '__custom__') {
+    customAutomataManager.open();
+    return;
+  }
+
   const p = PRESETS[presetKey];
   if (!p) return;
 
@@ -2278,17 +3009,20 @@ function loadPreset(presetKey) {
 const presetSelect = document.getElementById('presetSelect');
 if (presetSelect) {
   presetSelect.addEventListener('change', e => {
-    if (e.target.value) {
+    if (e.target.value === '__custom__') {
+      customAutomataManager.open();
+    } else if (e.target.value) {
       loadPreset(e.target.value);
     }
   });
 }
 
-// Bootstrap app, theme, sound, interactive background, history, and initial preset
+// Bootstrap app, theme, sound, interactive background, history, customizer, and initial preset
 soundEngine.init();
 initTheme();
 initInteractiveBackground();
 historyManager.init();
+customAutomataManager.init();
 loadPreset('ends_01');
 siteLoader.initEvents();
 

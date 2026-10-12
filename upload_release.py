@@ -5,28 +5,35 @@ import subprocess, json, urllib.request, urllib.error, sys, os
 
 OWNER    = "ankitbhisikar"
 REPO     = "FA-Regular-Grammar-Engine"
-TAG      = "v1.2.0"
-NAME     = "FA Regular Grammar Engine v1.2.0"
+TAG      = "v1.4.0"
+NAME     = "FA Regular Grammar Engine v1.4.0"
 APK_FILE = "fa-grammar-signed.apk"
 ZIP_FILE = "fa-grammar-signed.zip"
 
-BODY = """## FA Regular Grammar Engine – v1.2.0
+BODY = """## FA Regular Grammar Engine – v1.4.0
 
-### Bug Fixes & Improvements
-- **Preloader on Android** – Added full mobile-responsive CSS for the animated preloader; it now displays correctly inside the TWA/APK on all screen sizes
-- **Standalone/TWA mode** – Preloader now respects `safe-area-inset` for notched/punch-hole Android screens
-- **Landscape support** – Preloader adapts to landscape orientation on mobile
-- **Small screen support** – Specific styles for ≤380px screens (older Android devices)
+### What's New in v1.4.0
+- **Binary Divisibility Presets**: Divisible by 2, 3, 4, 5 and NOT Divisible by 2, 3, 4, 5 using modulo remainder state transitions δ(qᵢ, b) = q₍₂ᵢ₊ᵦ₎ mod N and complementary accept states.
+- **Real-Time Automata Customizer**: Interactive modal to synthesize custom DFAs and regular grammars:
+  - Modulo Divisibility for arbitrary N ≥ 1 with customizable bases (Binary, Decimal, Ternary, Hex) and conditions (Divisible, NOT Divisible, Remainder = k).
+  - Substring & Pattern DFA synthesizer (Contains, Ends With, Starts With, and Complemented/Negated variants).
+  - Count Modulo k DFA synthesizer (Even/Odd symbol occurrences).
+  - Live reactive preview calculating state sets, start/finals, and sample strings.
+- **Python Backend Server Engine (`server.py`)**:
+  - Live REST API endpoints (`/api/generate-machine`, `/api/grammar`, `/api/simulate`, `/api/status`).
+  - Real-time dual-engine execution: compiles via backend server or client-side fallback.
+  - Header server connection status indicator with periodic heartbeat.
 
-### Previous Fixes (v1.1.0)
-- Fixed "App not installed" error from signing key mismatch
-- Fixed broken URL (`ankitbhisikar.github.iohttps://...`) in TWA launch
+### Previous Changes
+- v1.3.0: Mobile-responsive layout overhaul, safe-area support for notched screens, and landscape modes.
+- v1.2.0: Mobile preloader CSS and TWA display fixes.
+- v1.1.0: Fixed signing key mismatch and start URL.
+- v1.0.0: Initial release.
 
 ### Install on Android
-1. Uninstall any previous version first (one-time step)
-2. Download **fa-grammar-signed.apk** below
-3. Enable *Install unknown apps* in Android Settings → Security
-4. Tap the APK to install
+1. Download **fa-grammar-signed.apk** below
+2. Enable *Install unknown apps* in Android Settings → Security
+3. Tap the APK to install
 
 ### Web App
 Live at: https://ankitbhisikar.github.io/FA-Regular-Grammar-Engine/

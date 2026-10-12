@@ -6,8 +6,8 @@
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/🌐_Live_Demo-GitHub_Pages-0B1220?style=for-the-badge&labelColor=1a2540)](https://ankitbhisikar.github.io/FA-Regular-Grammar-Engine/)
-[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.2.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.apk)
-[![Release](https://img.shields.io/badge/🏷️_Release-v1.2.0-6e40c9?style=for-the-badge)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.2.0)
+[![Download APK](https://img.shields.io/badge/📱_Android_APK-v1.4.0-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.4.0/fa-grammar-signed.apk)
+[![Release](https://img.shields.io/badge/🏷️_Release-v1.4.0-6e40c9?style=for-the-badge)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.4.0)
 [![License](https://img.shields.io/badge/📄_License-Academic-blue?style=for-the-badge)](README.md)
 
 </div>
@@ -46,9 +46,23 @@ This engine bridges the gap between state machines and grammar productions by:
 
 ## ✨ Key Features
 
-- **Classic DFA Presets (1-Click Loading)**:
-  - Instantly load classic Theory of Computation automata problems (e.g. *Ends with "01"*, *Even number of 0s*, *Contains "101"*, *Binary divisible by 3*, *Alternating symbols*).
+- **Classic DFA Presets & Divisibility Engine (1-Click Loading)**:
+  - Instantly load classic Theory of Computation automata problems (e.g. *Ends with "01"*, *Even number of 0s*, *Contains "101"*, *Alternating symbols*).
+  - Built-in binary divisibility presets: **Divisible by 2, 3, 4, 5** and **NOT Divisible by 2, 3, 4, 5** with complementary accept states.
   - Automatically configures the alphabet, transition table, start & accepting states, and loads a sample string for immediate testing.
+- **✨ Real-Time Automata Customizer (Modal & Live Builder)**:
+  - **Arbitrary Modulo Divisibility ($N \ge 1$)**: Synthesize DFAs for any divisor $N$ in Binary (Base 2), Decimal (Base 10), Ternary (Base 3), Hex (Base 16), or custom bases.
+  - **Flexible Conditions**: Choose between *Divisible by N* (remainder 0), *NOT Divisible by N* (remainder $\ne 0$), or *Custom Remainder* ($k \pmod N$).
+  - **Pattern Matching & Substrings**: Generate DFAs for *Contains Substring*, *Ends With*, *Starts With*, and their negated complement variants.
+  - **Count Modulo $k$**: Tracks symbol frequencies modulo $k$ (e.g. even/odd count of `0`s).
+  - **Real-Time Live Preview**: Instant visual calculation of states $Q$, start state $q_0$, finals $F$, and sample accepting string as sliders and chips are toggled.
+- **⚡ Dual-Engine Python Backend Server (`server.py`)**:
+  - Live REST API providing server-side compilation:
+    - `POST /api/generate-machine`: Synthesizes full DFA and dual regular grammars in real time.
+    - `POST /api/grammar`: Derives formal Right-Linear and Left-Linear production rules on the backend.
+    - `POST /api/simulate`: Server-side string execution with state trajectory and formal derivation paths.
+    - `GET /api/status`: Health check and engine capability probing.
+  - Instant client-side fallback when running offline or without the Python backend active.
 - **Dynamic DFA Configuration**:
   - Set arbitrary state counts ($1 \le n \le 12$, labeled $q_0, q_1, \dots$).
   - Customize input alphabet symbols $\Sigma$ (e.g., `0,1` or `a,b,c`).
@@ -115,10 +129,10 @@ The FA Regular Grammar Engine is available as a native **Android app** — no Pl
 
 | File | Size | Description |
 |------|------|-------------|
-| [**fa-grammar-signed.apk**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.apk) | 2.6 MB | ✅ Signed APK — install directly on Android |
-| [**fa-grammar-signed.zip**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.zip) | 4.9 MB | 📦 Full package (APK + AAB + keystore) |
+| [**fa-grammar-signed.apk**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.4.0/fa-grammar-signed.apk) | 2.6 MB | ✅ Signed APK — install directly on Android |
+| [**fa-grammar-signed.zip**](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.4.0/fa-grammar-signed.zip) | 4.9 MB | 📦 Full package (APK + AAB + keystore) |
 
-> 🏷️ **Latest Release:** [v1.2.0](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.2.0)
+> 🏷️ **Latest Release:** [v1.4.0](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/tag/v1.4.0)
 
 ### Installation Steps
 
@@ -150,6 +164,26 @@ python build_apk.py
 ---
 
 ## 📋 Changelog
+
+### v1.4.0 — Real-Time Automata Customizer, Divisibility Engine & Server Synthesis
+- **Added** Complete binary divisibility preset suite: **Divisible by 2, 3, 4, 5** and **NOT Divisible by 2, 3, 4, 5** utilizing canonical remainder state transitions $\delta(q_i, b) = q_{(2i+b) \pmod N}$ and complementary accept state partitioning.
+- **Added** **✨ Real-Time Automata Customizer (`#customizerModal`)**:
+  - **Modulo Divisibility Generator**: Arbitrary divisor $N \ge 1$ across Binary ($\Sigma=\{0,1\}$), Decimal ($\Sigma=\{0..9\}$), Ternary ($\Sigma=\{0,1,2\}$), Hexadecimal ($\Sigma=\{0..9,A..F\}$), and custom bases.
+  - **Acceptance Condition Rules**: Divisible (remainder 0), NOT Divisible (remainder $\ne 0$), or Custom Remainder ($k \pmod N$).
+  - **Pattern & Substring Engine**: Generates minimal DFAs for *Contains Substring*, *Ends With*, *Starts With*, plus their complemented (NOT) versions.
+  - **Count Modulo $k$**: Tracks symbol frequency parity and modulo counting (e.g., even/odd symbol counts).
+  - **Live Reactive Preview**: Instant visual calculation of states $Q$, start state $q_0$, final states $F$, and sample accepting strings.
+- **Added** **Python Backend Real-Time Server Engine (`server.py`)**:
+  - `POST /api/generate-machine`: Server-side DFA generation and dual regular grammar synthesis.
+  - `POST /api/grammar`: Compiles Right-Linear and Left-Linear production rule sets from raw transition functions.
+  - `POST /api/simulate`: Evaluates string execution traces and formal derivation trees on the server.
+  - `GET /api/status`: Health check endpoint reporting engine status and version.
+- **Added** **Header Server Status Pill**: Real-time status badge with periodic heartbeat ping, manual reconnect probe, and seamless client-side offline fallback.
+
+### v1.3.0 — Mobile & Tablet Responsive Layout
+- **Added** Mobile responsive CSS overhaul with media queries for phone (≤600px) and tablet (≤900px).
+- **Added** Full safe-area support (`safe-area-inset`) for notched screens, punch-hole cameras, and navigation bars.
+- **Added** Landscape orientation layout and compact UI adjustments.
 
 ### v1.2.0 — Mobile Preloader Fix
 - **Added** full mobile-responsive CSS for the animated preloader inside the Android TWA/APK
@@ -244,9 +278,10 @@ FA-Regular-Grammar-Engine/
 ```
 
 ### File Responsibilities:
-- **`index.html`**: Semantic HTML5 layout featuring header, two-column responsive grid, configuration panels, SVG canvas, grammar display cards, derivation output panels, preloader, and history modal.
-- **`style.css`**: CSS3 variable design tokens (`--bg`, `--panel`, `--accent`, `--accent2`), flexbox/grid layouts, custom scrollbars, typography using IBM Plex Sans/Mono and Space Grotesk, preloader animations, and history drawer styles.
+- **`index.html`**: Semantic HTML5 layout featuring header, two-column responsive grid, configuration panels, SVG canvas, grammar display cards, derivation output panels, preloader, history modal, and the **Real-Time Automata Customizer Modal (`#customizerModal`)**.
+- **`style.css`**: CSS3 variable design tokens (`--bg`, `--panel`, `--accent`, `--accent2`), flexbox/grid layouts, custom scrollbars, typography using IBM Plex Sans/Mono and Space Grotesk, preloader animations, mobile responsive media queries, and customizer modal styles.
 - **`script.js`**:
+  - `customAutomataManager`: Live client/server compiler controller, real-time live preview calculator, and mathematical automata synthesis engine.
   - `siteLoader`: Preloader controller with organic ease-in/ease-out timing.
   - `historyManager`: Dual-persistence engine (localStorage + SQLite backend).
   - `buildTable()`: Generates dynamic matrix UI with start/final state chips.
@@ -254,7 +289,7 @@ FA-Regular-Grammar-Engine/
   - `renderGrammars()`: Formats formal grammar tuples and production rules.
   - `drawDiagram()`: Calculates trigonometric coordinates and renders interactive SVG states, transitions, markers, and labels.
   - `runTest()`: Evaluates string acceptance and builds step-by-step derivation HTML trees.
-- **`server.py`**: Lightweight Python HTTP server with SQLite-backed REST API (`/api/history` GET/POST/DELETE, `/api/export-sql` GET). Zero pip dependencies.
+- **`server.py`**: Lightweight Python HTTP server & REST API (`/api/generate-machine`, `/api/grammar`, `/api/simulate`, `/api/status`, `/api/history`, `/api/history/export.sql`). Zero pip dependencies.
 - **`build_apk.py`**: Calls PWABuilder cloud API to generate a signed Android APK from the GitHub Pages URL.
 
 ---
@@ -269,61 +304,70 @@ Visit directly — no setup needed:
 
 ### Method 2: Android App
 Download and install the signed APK:  
-👉 **[fa-grammar-signed.apk (v1.2.0)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.2.0/fa-grammar-signed.apk)**
+👉 **[fa-grammar-signed.apk (v1.4.0)](https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine/releases/download/v1.4.0/fa-grammar-signed.apk)**
 
-### Method 3: Local Development
+### Method 3: Local Development (With Real-Time Python Backend)
 ```bash
 # Clone the repository
 git clone https://github.com/ankitbhisikar/FA-Regular-Grammar-Engine.git
 cd FA-Regular-Grammar-Engine
 
-# Start the app (no build needed — just open in browser)
-# Option A: Python simple server
-python -m http.server 8000
-# Then open: http://localhost:8000
-
-# Option B: Enable SQLite history backend
+# Start the Python server (Serves Web App + Real-Time Generation REST API + SQLite DB)
 python server.py 8000
 # Then open: http://localhost:8000
 ```
+> 💡 When running `server.py`, the header will display **`🟢 Server: Online (2.0)`**, enabling direct backend machine synthesis and SQLite history persistence!
 
 ### Method 4: VS Code Live Server
 1. Open the project folder in VS Code.
-2. Right-click `index.html` and select **Open with Live Server**.
+2. Right-click `index.html` and select **Open with Live Server**. (Will use client-side offline compiler fallback).
 
 ---
 
 ## 🛠️ User Guide
 
-1. **Step 01 — Configuration**:
+1. **Option A — 1-Click Classic & Divisibility Presets**:
+   - Open the **Classic DFA Presets** dropdown.
+   - Choose from classic patterns (*Ends with "01"*, *Even number of 0s*, *Contains "101"*, *Alternating*) or binary divisibility (*Divisible by 2, 3, 4, 5* and *NOT Divisible by 2, 3, 4, 5*).
+   - The table, diagram, and grammars will generate immediately!
+
+2. **Option B — ✨ Customize Machine (Live Real-Time Generator)**:
+   - Select **`✨ Customize Machine (Live Real-Time Generator)...`** at the top of the preset dropdown.
+   - Choose your synthesis mode:
+     - **Divisibility Modulo $N$**: Adjust divisor $N$ ($1 \le N \le 16+$), pick acceptance criteria (Divisible, NOT Divisible, or Custom Remainder), and choose number base (Binary, Decimal, Ternary, Hex).
+     - **Substring Patterns**: Enter any target pattern, choose mode (Contains, Ends With, Starts With), and optionally toggle **Complement / NOT**.
+     - **Count Modulo $k$**: Set symbol and modulus for parity/frequency checking.
+   - Watch the **Real-Time Live Preview** calculate states, start/finals, and sample strings dynamically.
+   - Click **Apply to Workspace →** (or **⚡ Server Real-Time** for server-side generation).
+
+3. **Step 01 — Manual DFA Configuration**:
    - Enter the desired number of states in **States (n)** (e.g., `3`).
    - Enter the alphabet in **Alphabet (Σ)** separated by commas (e.g., `0,1` or `a,b`).
    - Click **Rebuild Table** to update the transition matrix.
 
-2. **Step 02 — Transition Function ($\delta$)**:
+4. **Step 02 — Transition Function ($\delta$)**:
    - Select destination states from dropdowns for each state-symbol pair.
    - Click the **start** chip under a state to set the initial state (marked in amber).
    - Click the **final** chip under states to toggle accepting status (marked in teal).
    - Click **Generate Grammars →**.
 
-3. **Step 03 — State Diagram**:
-   - View the generated SVG state machine diagram. Amber rings indicate the start state; double teal rings indicate accepting states.
+5. **Step 03 — State Diagram & Interactive Visualizer**:
+   - View the generated SVG state machine diagram. Amber rings indicate start state; double teal rings indicate accepting states.
+   - Use playback controls (▶ Play, Next ▶, ◀ Prev, ↺ Reset) to watch the active state token glide along transitions with synchronized Web Audio sound effects.
 
-4. **Step 04 — Derived Grammars**:
-   - Review the formal definitions:
+6. **Step 04 — Derived Grammars**:
+   - Review formal definitions:
      - **$G_R$** (Right-Linear Grammar): Rules of the form $A \to aB \mid \varepsilon$.
      - **$G_L$** (Left-Linear Grammar): Rules of the form $A \to Ba \mid \varepsilon$.
 
-5. **Step 05 — Test & Derivation Trace**:
-   - Enter an input string into the text field (e.g., `1001`, `01`).
-   - Click **Run** or press <kbd>Enter</kbd>.
-   - View the **Accepted / Rejected verdict**, transition path, and detailed step-by-step derivations in both grammars.
+7. **Step 05 — Test & Derivation Trace**:
+   - Enter an input string into the text field (e.g., `110`, `1010`, `0101`).
+   - Click **Run** or **▶ Animate**.
+   - View the **Accepted / Rejected verdict**, transition path, failure diagnosis, and step-by-step derivations in both grammars.
 
-6. **Step 06 — History**:
+8. **Step 06 — History & SQLite Export**:
    - Click the **📜 History** button in the header to open the history drawer.
-   - View past DFA configurations, test strings, timestamps, and verdicts.
-   - Click **Restore** on any entry to reload that DFA configuration instantly.
-   - Use **Export SQL** to download a complete `.sql` dump of the history database.
+   - Restore past DFA configurations with 1 click, or click **💾 Export .SQL** to download a complete SQL database dump.
 
 ---
 
@@ -400,6 +444,33 @@ python server.py 8000
 - `0101`: **Accepted**
 - `101`: **Accepted**
 - `001`: **Rejected** (reaches trap state $q_3$)
+
+---
+
+### Example 6: Binary Divisible by 2 (Even Binary) & NOT Divisible by 2 (Odd Binary)
+- **Alphabet**: $\Sigma = \{0, 1\}$
+- **States**: $Q = \{q_0, q_1\}$ ($q_0$ = even remainder $0$, $q_1$ = odd remainder $1$)
+- **Transition Law**: $\delta(q_i, b) = q_{(2i + b) \pmod 2}$
+- **Divisible by 2 Finals**: $F = \{q_0\}$ (accepts numbers ending in `0`)
+  - `110` ($6_{10}$): **Accepted**
+  - `101` ($5_{10}$): **Rejected**
+- **NOT Divisible by 2 Finals**: $F = \{q_1\}$ (accepts numbers ending in `1`)
+  - `111` ($7_{10}$): **Accepted**
+  - `100` ($4_{10}$): **Rejected**
+
+---
+
+### Example 7: Binary Divisible by 4 & Divisible by 5
+- **Divisible by 4 ($N=4$)**:
+  - $Q = \{q_0, q_1, q_2, q_3\}$, $F = \{q_0\}$
+  - `1100` ($12_{10}$): **Accepted**
+  - `101` ($5_{10}$): **Rejected** (ends in $q_1$)
+- **Divisible by 5 ($N=5$)**:
+  - $Q = \{q_0, q_1, q_2, q_3, q_4\}$, $F = \{q_0\}$
+  - `1010` ($10_{10}$): **Accepted**
+  - `1111` ($15_{10}$): **Accepted**
+  - `110` ($6_{10}$): **Rejected** (ends in $q_1$)
+- **NOT Divisible by 5**: Same transitions with complementary accept states $F = \{q_1, q_2, q_3, q_4\}$.
 
 ---
 
